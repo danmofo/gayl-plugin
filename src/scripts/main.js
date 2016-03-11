@@ -58,7 +58,7 @@ Query.parse = function parse(query) {
   }
 
   // Return the new query object, todo: remove api type from the query...
-  var q = new Query(q.split('m ').join('').split('c ').join(''), type);
+  var q = new Query(query.split('m ').join('').split('c ').join(''), type);
   console.log(q);
 
   return q;
