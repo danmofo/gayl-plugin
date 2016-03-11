@@ -1,4 +1,183 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+// Copyright Joyent, Inc. and other Node contributors.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a
+// copy of this software and associated documentation files (the
+// "Software"), to deal in the Software without restriction, including
+// without limitation the rights to use, copy, modify, merge, publish,
+// distribute, sublicense, and/or sell copies of the Software, and to permit
+// persons to whom the Software is furnished to do so, subject to the
+// following conditions:
+//
+// The above copyright notice and this permission notice shall be included
+// in all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
+// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
+// USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+'use strict';
+
+// If obj.hasOwnProperty has been overridden, then calling
+// obj.hasOwnProperty(prop) will break.
+// See: https://github.com/joyent/node/issues/1707
+function hasOwnProperty(obj, prop) {
+  return Object.prototype.hasOwnProperty.call(obj, prop);
+}
+
+module.exports = function(qs, sep, eq, options) {
+  sep = sep || '&';
+  eq = eq || '=';
+  var obj = {};
+
+  if (typeof qs !== 'string' || qs.length === 0) {
+    return obj;
+  }
+
+  var regexp = /\+/g;
+  qs = qs.split(sep);
+
+  var maxKeys = 1000;
+  if (options && typeof options.maxKeys === 'number') {
+    maxKeys = options.maxKeys;
+  }
+
+  var len = qs.length;
+  // maxKeys <= 0 means that we should not limit keys count
+  if (maxKeys > 0 && len > maxKeys) {
+    len = maxKeys;
+  }
+
+  for (var i = 0; i < len; ++i) {
+    var x = qs[i].replace(regexp, '%20'),
+        idx = x.indexOf(eq),
+        kstr, vstr, k, v;
+
+    if (idx >= 0) {
+      kstr = x.substr(0, idx);
+      vstr = x.substr(idx + 1);
+    } else {
+      kstr = x;
+      vstr = '';
+    }
+
+    k = decodeURIComponent(kstr);
+    v = decodeURIComponent(vstr);
+
+    if (!hasOwnProperty(obj, k)) {
+      obj[k] = v;
+    } else if (isArray(obj[k])) {
+      obj[k].push(v);
+    } else {
+      obj[k] = [obj[k], v];
+    }
+  }
+
+  return obj;
+};
+
+var isArray = Array.isArray || function (xs) {
+  return Object.prototype.toString.call(xs) === '[object Array]';
+};
+
+},{}],2:[function(require,module,exports){
+// Copyright Joyent, Inc. and other Node contributors.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a
+// copy of this software and associated documentation files (the
+// "Software"), to deal in the Software without restriction, including
+// without limitation the rights to use, copy, modify, merge, publish,
+// distribute, sublicense, and/or sell copies of the Software, and to permit
+// persons to whom the Software is furnished to do so, subject to the
+// following conditions:
+//
+// The above copyright notice and this permission notice shall be included
+// in all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
+// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
+// USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+'use strict';
+
+var stringifyPrimitive = function(v) {
+  switch (typeof v) {
+    case 'string':
+      return v;
+
+    case 'boolean':
+      return v ? 'true' : 'false';
+
+    case 'number':
+      return isFinite(v) ? v : '';
+
+    default:
+      return '';
+  }
+};
+
+module.exports = function(obj, sep, eq, name) {
+  sep = sep || '&';
+  eq = eq || '=';
+  if (obj === null) {
+    obj = undefined;
+  }
+
+  if (typeof obj === 'object') {
+    return map(objectKeys(obj), function(k) {
+      var ks = encodeURIComponent(stringifyPrimitive(k)) + eq;
+      if (isArray(obj[k])) {
+        return map(obj[k], function(v) {
+          return ks + encodeURIComponent(stringifyPrimitive(v));
+        }).join(sep);
+      } else {
+        return ks + encodeURIComponent(stringifyPrimitive(obj[k]));
+      }
+    }).join(sep);
+
+  }
+
+  if (!name) return '';
+  return encodeURIComponent(stringifyPrimitive(name)) + eq +
+         encodeURIComponent(stringifyPrimitive(obj));
+};
+
+var isArray = Array.isArray || function (xs) {
+  return Object.prototype.toString.call(xs) === '[object Array]';
+};
+
+function map (xs, f) {
+  if (xs.map) return xs.map(f);
+  var res = [];
+  for (var i = 0; i < xs.length; i++) {
+    res.push(f(xs[i], i));
+  }
+  return res;
+}
+
+var objectKeys = Object.keys || function (obj) {
+  var res = [];
+  for (var key in obj) {
+    if (Object.prototype.hasOwnProperty.call(obj, key)) res.push(key);
+  }
+  return res;
+};
+
+},{}],3:[function(require,module,exports){
+'use strict';
+
+exports.decode = exports.parse = require('./decode');
+exports.encode = exports.stringify = require('./encode');
+
+},{"./decode":1,"./encode":2}],4:[function(require,module,exports){
 /*!
  * jQuery JavaScript Library v2.2.1
  * http://jquery.com/
@@ -9831,26 +10010,126 @@ if ( !noGlobal ) {
 return jQuery;
 }));
 
-},{}],2:[function(require,module,exports){
+},{}],5:[function(require,module,exports){
+module.exports = {
+	TEMPLATE_START_TAG: '{',
+	TEMPLATE_END_TAG: '}',
+	API_TYPES: {
+	  MERCHANT: 'merchant',
+	  CAUSE: 'cause',
+	  UNIVERSAL: 'all'
+	},
+	ENDPOINTS: {
+	  merchant: 'https://www.giveasyoulive.com/merchants/select?q={$query$}&wt=everyclick&fq=subscriber:1&facet=true&facet.mincount=1&facet.field=category&rows=5&start=0',
+	  cause: 'https://workwithus.giveasyoulive.com/charity/select?q={$query$}&rows=5&start=0',
+	},
+	TEMPLATES:  {
+	  'merchantName': {
+	    template: '<match>Merchant API</match> (name): {name}',
+	    content: 'This is the content! 2',
+	  },
+	  'merchantId': {
+	    template: '<match>Merchant API</match> (id): {id}',
+	    content: 'This is the content! 3',
+	  },
+	  'merchantImage': {
+	    template: '<match>Merchant API</match> (logo): https://www.giveasyoulive.com/{logo}',
+	    content: 'This is the content! 4',
+	  },
+	  'merchantStoreUrl': {
+	    template: '<match>Merchant API </match><dim>(url)</dim>: https://www.giveasyoulive.com/store/{uri}',
+	    content: 'This is the content! 5',
+	  },
+	  'causeName': {
+	    template: '<match>Cause API</match> <dim>(name)</dim>: {name}',
+	    content: 'This is the content! 6',
+	  },
+	  'causeId': {
+	    template: '<match>Cause API</match> <dim>(id)</dim>: {id}',
+	    content: 'This is the content! 7',
+	  },
+	  'causeImage': {
+	    template: '<match>Cause API</match>: {image}',
+	    content: 'This is the content! 8',
+	  },
+	  'causeJoinUrl': {
+	    template: '<match>Cause API</match> (url): {url}',
+	    content: 'This is the content! 9',
+	  },
+	  'causeWebsiteUrl': {
+	    template: '<match>Cause API</match> (seo): {seo}',
+	    content: 'This is the content! 10',
+	  }
+	}
+};
+},{}],6:[function(require,module,exports){
 var $ = require('jquery');
+var config = require('./config');
+var querystring = require('querystring');
+var Query = require('./query');
+var utils = require('./utils');
+var CauseService = require('./services/cause');
+var MerchantService = require('./services/merchant');
+var CauseMerchantService = require('./services/causeMerchant');
+var Suggestion = require('./suggestion');
 
-// Extension configuration
-var config = {
-  minLength: 3
-};
+var API_TYPES = config.API_TYPES;
+var ENDPOINTS = config.ENDPOINTS;
+var query = utils.query;
+var get = utils.get;
+var MerchantApiResponseTransformer = utils.transformers.merchant;
+var CauseApiResponseTransformer = utils.transformers.cause;
+var determineQueryType = utils.determineQueryType;
+var TEMPLATES = config.TEMPLATES;
+var TEMPLATE_START_TAG = config.TEMPLATE_START_TAG;
+var TEMPLATE_END_TAG = config.TEMPLATE_END_TAG;
+var getTemplate = utils.getTemplate;
+var createTemplate = utils.createTemplate;
 
-var API_TYPES = {
-  MERCHANT: 'merchant',
-  CAUSE: 'cause',
-  UNIVERSAL: 'all'
-};
 
-var ENDPOINTS = {
-  merchant: 'https://www.giveasyoulive.com/merchants/select?q={$query$}&wt=everyclick&fq=subscriber:1&facet=true&facet.mincount=1&facet.field=category&rows=5&start=0',
-  cause: 'https://workwithus.giveasyoulive.com/charity/select?q={$query$}&rows=5&start=0',
-  'asdf': ''
-};
 
+chrome.omnibox.onInputChanged.addListener(
+  function(text, addSuggestions) {
+
+    // Parse the user input into something useful
+    var q = Query.parse(text);
+
+    // Call different APIs based on the user input
+    switch(q.type) {
+      case API_TYPES.MERCHANT:
+       MerchantService.getMerchants(q).then(function(response) {
+          addSuggestions(Suggestion.buildSuggestions(response[0], q));
+        });
+
+        break;
+      case API_TYPES.CAUSE:
+        CauseService.getCauses(q).then(function(response) {
+          addSuggestions(Suggestion.buildSuggestions(response[0], q));
+        });
+
+        break;
+      case API_TYPES.UNIVERSAL:
+        CauseMerchantService.getAll(q).then(function(response) {
+          addSuggestions(Suggestion.buildSuggestions(response[0], q));
+        });     
+        break;
+      default:
+        break;
+    }
+});
+
+chrome.omnibox.onInputEntered.addListener(function(text) {
+  if(text.indexOf('http') > -1) {
+    chrome.tabs.create({
+      url: text
+    });
+  }
+
+  console.log(text);
+});
+
+},{"./config":5,"./query":7,"./services/cause":8,"./services/causeMerchant":9,"./services/merchant":10,"./suggestion":11,"./utils":12,"jquery":4,"querystring":3}],7:[function(require,module,exports){
+module.exports = Query;
 
 function Query(value, type) {
   this.type = type || API_TYPES.UNIVERSAL;
@@ -9897,63 +10176,54 @@ Query.parse = function parse(query) {
 
   return q;
 };
+},{}],8:[function(require,module,exports){
+module.exports = CauseService;
 
-var TEMPLATES = {
-  'merchantName': {
-    template: '<match>Merchant API</match> (name): {name}',
-    content: 'This is the content! 2',
-  },
-  'merchantId': {
-    template: '<match>Merchant API</match> (id): {id}',
-    content: 'This is the content! 3',
-  },
-  'merchantImage': {
-    template: '<match>Merchant API</match> (logo): https://www.giveasyoulive.com/{logo}',
-    content: 'This is the content! 4',
-  },
-  'merchantStoreUrl': {
-    template: '<match>Merchant API </match><dim>(url)</dim>: https://www.giveasyoulive.com/store/{uri}',
-    content: 'This is the content! 5',
-  },
-  'causeName': {
-    template: '<match>Cause API</match> <dim>(name)</dim>: {name}',
-    content: 'This is the content! 6',
-  },
-  'causeId': {
-    template: '<match>Cause API</match> <dim>(id)</dim>: {id}',
-    content: 'This is the content! 7',
-  },
-  'causeImage': {
-    template: '<match>Cause API</match>: {image}',
-    content: 'This is the content! 8',
-  },
-  'causeJoinUrl': {
-    template: '<match>Cause API</match> (url): {url}',
-    content: 'This is the content! 9',
-  },
-  'causeWebsiteUrl': {
-    template: '<match>Cause API</match> (seo): {seo}',
-    content: 'This is the content! 10',
-  }
+function CauseService() {
+
+}
+
+CauseService.getCauses = function getCauses(queryObject) {
+  queryObject.type = API_TYPES.CAUSE;
+  return get(query(queryObject)).then(function(response) {
+    return new CauseApiResponseTransformer(response).transform();
+  });
 };
+},{}],9:[function(require,module,exports){
+module.exports = CauseMerchantService;
 
-var TEMPLATE_START_TAG  = '{';
-var TEMPLATE_END_TAG    = '}';
+function CauseMerchantService() {
 
-function getTemplate(key) {
-  return TEMPLATES[key];
 }
 
-// todo: use an actual templating engine
-function createTemplate(template, model) {
-  for(var key in model) {
-    template = template.split(TEMPLATE_START_TAG + key + TEMPLATE_END_TAG).join(model[key]);
-  }
+CauseMerchantService.getAll = function getAll(queryObject) {
+  var merchantQueryObject = {
+    type: API_TYPES.MERCHANT,
+    value: queryObject.value
+  };
+  var causeQueryObject = {
+    type: API_TYPES.CAUSE,
+    value: queryObject.value
+  };
 
-  return template;
+  return get(query(merchantQueryObject)).then(function(response) {
+    return new MerchantApiResponseTransformer(response).transform();
+  });
+};
+},{}],10:[function(require,module,exports){
+module.exports = MerchantService;
+
+function MerchantService() {
+	
 }
 
-// Object for creating suggestions
+MerchantService.getMerchants = function getMerchants(queryObject) {
+  queryObject.type = API_TYPES.MERCHANT;
+  return get(query(queryObject)).then(function(response) {
+    return new MerchantApiResponseTransformer(response).transform();
+  });
+};
+},{}],11:[function(require,module,exports){
 var Suggestion = {
   create: function(content, description) {
     var suggestion = {};
@@ -9968,7 +10238,7 @@ var Suggestion = {
   },
   // Build a list of Suggestion objects from the specified model + query
   // 
-  buildSuggestions: function(model, queryObject, templates) {
+  buildSuggestions: function(model, queryObject) {
     var suggestions = [];
 
     templates = {
@@ -9991,128 +10261,79 @@ var Suggestion = {
   }
 };
 
-function getCauses(queryObject) {
-  queryObject.type = API_TYPES.CAUSE;
-  return get(query(queryObject)).then(function(response) {
-    return new CauseApiResponseTransformer(response).transform();
-  });
-}
+module.exports = Suggestion;
+},{}],12:[function(require,module,exports){
+module.exports = {
 
-function getMerchants(queryObject) {
-  queryObject.type = API_TYPES.MERCHANT;
-  return get(query(queryObject)).then(function(response) {
-    return new MerchantApiResponseTransformer(response).transform();
-  });
-}
+	getTemplate: function getTemplate(key) {
+	  return TEMPLATES[key];
+	},
 
-function getAll(queryObject) {
-  var merchantQueryObject = {
-    type: API_TYPES.MERCHANT,
-    value: queryObject.value
-  };
-  var causeQueryObject = {
-    type: API_TYPES.CAUSE,
-    value: queryObject.value
-  };
+	// todo: use an actual templating engine
+	createTemplate: function createTemplate(template, model) {
+	  for(var key in model) {
+	    template = template.split(TEMPLATE_START_TAG + key + TEMPLATE_END_TAG).join(model[key]);
+	  }
 
-  return get(query(merchantQueryObject)).then(function(response) {
-    return new MerchantApiResponseTransformer(response).transform();
-  });
-}
+	  return template;
+	},
 
+	determineQueryType: function determineQueryType(query) {
+	  var types = {
+	    NUMBER: 'number',
+	    STRING: 'string'
+	  };
 
-chrome.omnibox.onInputChanged.addListener(
-  function(text, addSuggestions) {
+	  return isNaN(parseInt(query, 10)) ? types.STRING : types.NUMBER;
+	},
 
-    // Parse the user input into something useful
-    var q = Query.parse(text);
+	query: function query(queryObject) {
+	  var type = queryObject.type;
+	  var searchQuery = queryObject.value;
 
-    // Call different APIs based on the user input
-    switch(q.type) {
-      case API_TYPES.MERCHANT:
-        getMerchants(q).then(function(response) {
-          addSuggestions(Suggestion.buildSuggestions(response[0], q));
-        });
+	  if(queryObject.dataType === 'number') {
+	    searchQuery = 'id:' + searchQuery;
+	  }
 
-        break;
-      case API_TYPES.CAUSE:
-        getCauses(q).then(function(response) {
-          addSuggestions(Suggestion.buildSuggestions(response[0], q));
-        });
+	  return ENDPOINTS[type].split('{$query$}').join(searchQuery);
+	},
 
-        break;
-      case API_TYPES.UNIVERSAL:
-        getAll(q).then(function(response) {
-          addSuggestions(Suggestion.buildSuggestions(response[0], q));
-        });     
-        break;
-      default:
-        break;
-    }
-});
+	get: function get(url) {
+	  return $.ajax({
+	    method: 'GET',
+	    url: url
+	  });
+	},
 
-chrome.omnibox.onInputEntered.addListener(function(text) {
-  if(text.indexOf('http') > -1) {
-    chrome.tabs.create({
-      url: text
-    });
-  }
+	transformers: {
+		merchant: (function() {
 
-  console.log(text);
-});
+			function MerchantApiResponseTransformer(response) {
+			  this.response = response.result;
+			}
 
-function determineQueryType(query) {
-  var types = {
-    NUMBER: 'number',
-    STRING: 'string'
-  };
+			MerchantApiResponseTransformer.prototype.transform = function() {
+			  return this.response.doc && this.response.doc.length ? this.response.doc : [this.response.doc];
+			};
 
-  return isNaN(parseInt(query, 10)) ? types.STRING : types.NUMBER;
-}
+			return MerchantApiResponseTransformer;
 
-function query(queryObject) {
-  var type = queryObject.type;
-  var searchQuery = queryObject.value;
+		})(),
+		cause: (function () {
+			function CauseApiResponseTransformer(response) {
+			  this.response = response;
+			}
 
-  if(queryObject.dataType === 'number') {
-    searchQuery = 'id:' + searchQuery;
-  }
+			CauseApiResponseTransformer.prototype.transform = function() {
+			  if(this.response.doc) {
+			    return this.response.doc.length ? this.response.doc : [this.response.doc];   
+			  }
+			};
 
-  return ENDPOINTS[type].split('{$query$}').join(searchQuery);
-}
-
-function get(url) {
-  return $.ajax({
-    method: 'GET',
-    url: url
-  });
-}
+			return CauseApiResponseTransformer;
+		})() 
+	},
 
 
-function getTransformerFor(name) {
-  var transformers = {
-    merchant: MerchantApiResponseTransformer,
-    cause: CauseApiResponseTransformer
-  };
-
-  return transformers[name];
-}
-
-function MerchantApiResponseTransformer(response) {
-  this.response = response.result;
-}
-
-MerchantApiResponseTransformer.prototype.transform = function() {
-  return this.response.doc && this.response.doc.length ? this.response.doc : [this.response.doc];
 };
-
-function CauseApiResponseTransformer(response) {
-  this.response = response;
-}
-
-CauseApiResponseTransformer.prototype.transform = function() {
-  if(this.response.doc) {
-    return this.response.doc.length ? this.response.doc : [this.response.doc];   
-  }
-};
-},{"jquery":1}]},{},[2]);
+},{}]},{},[6]);
