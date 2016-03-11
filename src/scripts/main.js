@@ -1,3 +1,5 @@
+var $ = require('jquery');
+
 // Extension configuration
 var config = {
   minLength: 3
@@ -11,8 +13,10 @@ var API_TYPES = {
 
 var ENDPOINTS = {
   merchant: 'https://www.giveasyoulive.com/merchants/select?q={$query$}&wt=everyclick&fq=subscriber:1&facet=true&facet.mincount=1&facet.field=category&rows=5&start=0',
-  cause: 'https://workwithus.giveasyoulive.com/charity/select?q={$query$}&rows=5&start=0'
+  cause: 'https://workwithus.giveasyoulive.com/charity/select?q={$query$}&rows=5&start=0',
+  'asdf': ''
 };
+
 
 function Query(value, type) {
   this.type = type || API_TYPES.UNIVERSAL;
@@ -43,10 +47,10 @@ Query.parse = function parse(query) {
   if(bits.length > 1) {
     switch(bits[0]) {
       case 'm':
-        type = API_TYPES.MERCHANT
+        type = API_TYPES.MERCHANT;
         break;
       case 'c':
-        type = API_TYPES.CAUSE
+        type = API_TYPES.CAUSE;
         break;
       default:
         type = API_TYPES.UNIVERSAL;
@@ -54,10 +58,10 @@ Query.parse = function parse(query) {
   }
 
   // Return the new query object, todo: remove api type from the query...
-  var query = new Query(query.split('m ').join('').split('c ').join(''), type);
-  console.log(query);
+  var q = new Query(q.split('m ').join('').split('c ').join(''), type);
+  console.log(q);
 
-  return query;
+  return q;
 };
 
 var TEMPLATES = {
@@ -133,7 +137,7 @@ var Suggestion = {
   buildSuggestions: function(model, queryObject, templates) {
     var suggestions = [];
 
-    var templates = {
+    templates = {
       merchant: [queryObject.dataType === 'number' ? TEMPLATES.merchantName : TEMPLATES.merchantId, TEMPLATES.merchantStoreUrl, TEMPLATES.merchantImage],
       cause: [queryObject.dataType === 'number' ? TEMPLATES.causeName : TEMPLATES.causeId, TEMPLATES.causeJoinUrl, TEMPLATES.causeWebsiteUrl],
       universal: [TEMPLATES.causeName]
@@ -151,7 +155,7 @@ var Suggestion = {
 
     return suggestions;
   }
-}
+};
 
 function getCauses(queryObject) {
   queryObject.type = API_TYPES.CAUSE;
@@ -177,9 +181,9 @@ function getAll(queryObject) {
     value: queryObject.value
   };
 
-  return get(query(merchantQueryObject)).then(function(response)) {
+  return get(query(merchantQueryObject)).then(function(response) {
     return new MerchantApiResponseTransformer(response).transform();
-  }
+  });
 }
 
 
@@ -220,7 +224,7 @@ chrome.omnibox.onInputEntered.addListener(function(text) {
     });
   }
 
-  console.log(text)
+  console.log(text);
 });
 
 function determineQueryType(query) {

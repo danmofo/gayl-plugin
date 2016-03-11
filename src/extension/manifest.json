@@ -3,16 +3,16 @@
   "description" : "usage: CMD + L +  gl <store_name> OR <store_id> OR <charity_name> OR <charity_id>",
   "version": "1.1",
   "background": {
-    "scripts": ["jquery.js", "background.js"]
+    "scripts": ["background.js"]
   },
   "omnibox": { "keyword" : "gl" },
   "manifest_version": 2,
   "icons": {
-  	"16": "images/favicon-16x16.png",
-  	"32": "images/favicon-32x32.png",
-  	"96": "images/favicon-96x96.png",
-  	"160": "images/favicon-160x160.png",
-  	"196": "images/favicon-196x196.png"
+  	"16": "favicon-16x16.png",
+  	"32": "favicon-32x32.png",
+  	"96": "favicon-96x96.png",
+  	"160": "favicon-160x160.png",
+  	"196": "favicon-196x196.png"
   },
   "permissions": [
   	"tabs",
