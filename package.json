@@ -1,0 +1,24 @@
+{
+  "name": "gayl-plugin",
+  "version": "1.0.0",
+  "description": "Give as you Live search plugin ===",
+  "main": "index.js",
+  "dependencies": {
+    "querystring": "^0.2.0",
+    "jquery": "^2.2.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/danmofo/gayl-plugin.git"
+  },
+  "author": "",
+  "license": "UNLICENSED",
+  "bugs": {
+    "url": "https://github.com/danmofo/gayl-plugin/issues"
+  },
+  "homepage": "https://github.com/danmofo/gayl-plugin#readme"
+}
