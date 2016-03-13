@@ -38,9 +38,12 @@ Limitations:
 ---
 - 5 entry limit in the omnibox (Chrome limitation)
 - Only one omnibox command can be registered per plugin.. hence the gl c, gl m
+- Omnibox entries get lost if Google suggests a search term for your query, e.g. gl m 808 vs gl m Boots, both the exact same queries but the first loses a suggestion.
 
 Todo:
 ---
 
+- Add task to package extension for production
+- Add to website
 - Add other APIs
 - Replace huge libraries with smaller ones! The output size right now is hilariously bad.
