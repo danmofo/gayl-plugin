@@ -1,10 +1,31 @@
+/** 
+ *  A simple service for making API requests to the cause API (defined in config.js/ENDPOINTS/cause).
+ *
+ *  Prefer to use `get` over `getByName` or `getById` as `get` will determine which method to use
+ *  based on the query and has some default error handling.
+ *
+ *  Example:
+ *
+ *  // Uses getById
+ *  get(1517).then(function(results) {
+ *    console.log('Results: ', results);
+ *  });
+ *
+ *  // Uses getByName
+ *  get('cancer research uk');
+ * 
+ * 	@author danielmoffat
+ */
+
 module.exports = {
 	getById: getById,
 	getByName: getByName,
-	get: get
+	get: get,
+	getFirst: getFirst
 };
 
-var request = require('request');
+var Promise = require('bluebird');
+var request = Promise.promisifyAll(require('request'));
 var querystring = require('querystring');
 var merge = require('merge');
 var isNumber = require('is-number');
@@ -16,11 +37,11 @@ var defaults = {
 	rows: 5
 };
 
-// Example queries
-get('Starlight');
-get(2000);
-get(1517);
-get('Donkey Sanctuary');
+function getThenLog(query) {
+	return get(query).then(function(result) {
+		console.log(query, result);
+	});
+}
 
 /**
  * Helper function that ties all the other parts together.
@@ -29,21 +50,66 @@ get('Donkey Sanctuary');
  * @return {Object}       The cause object(s) if found or null.
  */
 function get(query) {
-	// Get the query function
+	// Get the query function to use
 	var fn = getQueryFunction(query);
 
-	// Get the results and transform them
-	return transform(fn(query));
+	return fn(query).catch(defaultErrorHandler);
+}
+
+// Helper function that calls get and plucks the first result from it.
+function getFirst(query) {
+	return get(query).then(function(resp) {
+		return {
+			numFound: 1,
+			docs: [resp.docs[0]]
+		};
+	});
+}
+
+/**
+ * Default error handler used for all api requests.
+ * @param  {Object} error The thrown error.
+ * @return {void}
+ */
+function defaultErrorHandler(error) {
+	console.log('Something just went wrong.')
+	console.log(err);
 }
 
 /**
  * Parses the response into a suitable object format. Allowing us to normalise return values
- * between different APIs.
+ * between different APIs. 
  *
  * @param  {Object} response The API response.
  * @return {Object}          The transformed API response.
  */
 function transform(response) {
+
+	// Replace oldKeys with newKeys (to match the other API response)
+	var oldKeys = ['@numfound', '@count', '@start'];
+	var newKeys = ['numFound', 'count', 'start'];
+
+	oldKeys.forEach(function(key, i) {
+		response[newKeys[i]] = parseInt(response[key], 10);
+		delete response[key];
+	});
+
+	// For some reason in the response if there is only one result
+	// an object is returned (instead of 1 item in an array), if there are no
+	// results the doc field is not even present.
+	// 
+	// By sorting it out here we avoid having to do so in the code that uses this service.
+	if(response.numFound === 0) {
+		response.docs = [];
+	} else if(response.numFound === 1) {
+		response.docs = [response.doc];
+	} else {
+		response.docs = response.doc;
+	}
+
+    // Remove the old doc
+	delete response.doc;
+
 	return response;
 }
 
@@ -59,7 +125,7 @@ function getById(id) {
 		q: 'id:' + id
 	});
 
-	console.log(query);
+	return makeApiRequest(query);
 }
 
 /**
@@ -74,7 +140,22 @@ function getByName(name) {
 		q: name
 	});
 
-	console.log(query);
+	return makeApiRequest(query);
+}
+
+/**
+ * Helper method for making API requests with a default response handler. In this
+ * case we just JSON.parse the body and manipulate the keys.
+ * @param  {String} query The full API query, e.g. https://the/api.com/v2/users/select?foo=bar
+ * @return {Promise}      The response.
+ */
+function makeApiRequest(query) {
+	return request.getAsync({
+		method: 'GET',
+		url: query
+	}).then(function(resp) {
+		return transform(JSON.parse(resp.body));
+	});
 }
 
 /**
@@ -96,5 +177,5 @@ function getQueryFunction(query) {
  * @return {String}             The API url.
  */
 function buildQuery(queryParams) {
-	return queryParams ? CAUSE_ENDPOINT + '?' + querystring.encode(merge(queryParams, defaults)) : endpoint;
+	return CAUSE_ENDPOINT + '?' + querystring.encode(merge(queryParams, defaults));
 }

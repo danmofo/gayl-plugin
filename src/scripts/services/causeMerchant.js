@@ -1,20 +1,20 @@
-module.exports = CauseMerchantService;
-
-function CauseMerchantService() {
-
-}
-
-CauseMerchantService.getAll = function getAll(queryObject) {
-  var merchantQueryObject = {
-    type: API_TYPES.MERCHANT,
-    value: queryObject.value
-  };
-  var causeQueryObject = {
-    type: API_TYPES.CAUSE,
-    value: queryObject.value
-  };
-
-  return get(query(merchantQueryObject)).then(function(response) {
-    return new MerchantApiResponseTransformer(response).transform();
-  });
+/**
+ *  A simple service for making API requests to the cause/merchant API, which is just a service
+ *  that ties the cause and merchant services together.
+ *
+ *  @author danielmoffat
+ */
+module.exports = {
+  get: get
 };
+
+var Promise = require('bluebird');
+var CauseService = require('./cause');
+var MerchantService = require('./merchant');
+
+function get(query) {
+  return Promise.all([
+    MerchantService.getFirst(query),
+    CauseService.getFirst(query)
+  ]);
+}

@@ -6,9 +6,10 @@ module.exports = {
 	  CAUSE: 'cause',
 	  UNIVERSAL: 'all'
 	},
+	// These are the only two endpoints with CORS enabled
 	ENDPOINTS: {
-	  merchant: 'https://www.giveasyoulive.com/merchants/select?q={$query$}&wt=everyclick&fq=subscriber:1&facet=true&facet.mincount=1&facet.field=category&rows=5&start=0',
-	  cause: 'https://workwithus.giveasyoulive.com/charity/select?q={$query$}&rows=5&start=0',
+	  merchant: 'https://www.giveasyoulive.com/merchants/select',
+	  cause: 'https://workwithus.giveasyoulive.com/charity/select',
 	},
 	TEMPLATES:  {
 	  'merchantName': {

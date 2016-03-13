@@ -23,6 +23,7 @@ var createTemplate = utils.createTemplate;
 
 
 
+
 chrome.omnibox.onInputChanged.addListener(
   function(text, addSuggestions) {
 
@@ -32,19 +33,19 @@ chrome.omnibox.onInputChanged.addListener(
     // Call different APIs based on the user input
     switch(q.type) {
       case API_TYPES.MERCHANT:
-       MerchantService.getMerchants(q).then(function(response) {
+       MerchantService.get(q).then(function(response) {
           addSuggestions(Suggestion.buildSuggestions(response[0], q));
         });
 
         break;
       case API_TYPES.CAUSE:
-        CauseService.getCauses(q).then(function(response) {
+        CauseService.get(q).then(function(response) {
           addSuggestions(Suggestion.buildSuggestions(response[0], q));
         });
 
         break;
       case API_TYPES.UNIVERSAL:
-        CauseMerchantService.getAll(q).then(function(response) {
+        CauseMerchantService.get(q).then(function(response) {
           addSuggestions(Suggestion.buildSuggestions(response[0], q));
         });     
         break;
