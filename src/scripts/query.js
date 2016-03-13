@@ -1,47 +1,73 @@
+/**
+ *  Examples:
+ *
+ *  Query.parse('m 2000');
+ *  => Query { apiType: 'merchant', value: '2000', dataType: 'number' }
+ *
+ *  Query.parse('c 1517');
+ *  => Query { apiType: 'cause', value: '1517', dataType: 'number' }
+ *
+ *  Query.parse('Amazon');
+ *  => Query { apiType: 'all', value: 'Amazon', dataType: 'string' }
+ *
+ *  @author danielmoffat
+ */
+
 module.exports = Query;
 
-function Query(value, type) {
-  this.type = type || API_TYPES.UNIVERSAL;
+var isNumber = require('is-number');
+var API_TYPES = require('./config').API_TYPES;
+
+/**
+ * Representation of an omnibox query entered by the user.
+ * @param {String} value   The text entered.
+ * @param {String} apiType The API type this query belongs to.
+ */
+function Query(value, apiType) {
+  this.apiType = apiType || API_TYPES.UNIVERSAL;
   this.value = value;
   this.dataType = this.determineDataType();
 }
 
-// Determine the data type of the query,
-// this is useful when you need to differentiate between ids and strings (e.g. 111 vs "Starlight")
+/**
+ * Helper for determining the data type of the query.
+ * @return {String} The data type.
+ */
 Query.prototype.determineDataType = function() {
   var types = {
     NUMBER: 'number',
     STRING: 'string'
   };
 
-  return isNaN(parseInt(this.value, 10)) ? types.STRING : types.NUMBER;
+  return isNumber(this.value) ? types.NUMBER : types.STRING;
 };
 
-
-// Static method for creating Query objects from an omnibox query
+/**
+ * Static method for creating Query objects from an omnibox query.
+ * @param  {String} query The query, e.g. "2000", "m starlight", "c 1517"
+ * @return {Query}        A query object.
+ */
 Query.parse = function parse(query) {
   if(!query || query === '') return;
 
+  // Split the query up to find out if a command was used
   var bits = query.split(' ');
-  var type = API_TYPES.UNIVERSAL;
+  var apiType = API_TYPES.UNIVERSAL;
 
-  // Determine what 'type' of query this is
+  // Determine the API from the query
   if(bits.length > 1) {
     switch(bits[0]) {
       case 'm':
-        type = API_TYPES.MERCHANT;
+        apiType = API_TYPES.MERCHANT;
         break;
       case 'c':
-        type = API_TYPES.CAUSE;
+        apiType = API_TYPES.CAUSE;
         break;
       default:
-        type = API_TYPES.UNIVERSAL;
+        apiType = API_TYPES.UNIVERSAL;
     }
   }
 
-  // Return the new query object, todo: remove api type from the query...
-  var q = new Query(query.split('m ').join('').split('c ').join(''), type);
-  console.log(q);
-
-  return q;
+  // The bits array always contains the query as the last value (and the command as the first, if its there)
+  return new Query(bits.pop(), apiType);
 };
