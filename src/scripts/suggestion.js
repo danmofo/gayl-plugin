@@ -23,10 +23,19 @@ var DATA_TYPES = config.DATA_TYPES;
 function create(content, description) {
   var suggestion = {};
 
-  suggestion.content = content;
-  suggestion.description = description ? description : content;
+  if(!description) {
+    suggestion.description = content;
+  } else {
+    suggestion.content = content;
+    suggestion.description = description;
+  }
 
   return suggestion;
+}
+
+function buildTemplate(model, templateKey) {
+  var suggestion = {};
+  ctemplateRender(config.TEMPLATES[templateKey], model);
 }
 
 /**
@@ -46,7 +55,7 @@ function buildSuggestions(model, queryObject) {
   templateKeys.forEach(function(key) {
     var entry = config.TEMPLATES[key];
     var template = templateRender(entry.template, model);
-    var content = entry.content;
+    var content = templateRender(entry.content, model);
     suggestions.push(create(content, template));
   });
 

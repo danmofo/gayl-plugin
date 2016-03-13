@@ -109,7 +109,7 @@ function transform(response) {
 		response.docs = response.doc;
 	}
 
-    // Remove the old doc
+  // Remove the old doc
 	delete response.doc;
 
 	// Remove unwanted stuff

@@ -59,40 +59,40 @@ module.exports = {
       ]
     },
 	  'merchantName': {
-	    template: '<match>Merchant API</match> (name):<% if(merchant.name) { %> <%= merchant.name %> <% } %>',
-	    content: 'This is the content! 2',
+	    template: '<match>Merchant API</match> <dim>(name)</dim>: <% if(merchant.name) { %><%= merchant.name %><% } %>',
+	    content: '<% if(merchant.name) { %><%= merchant.name %><% } %>'
 	  },
 	  'merchantId': {
-	    template: '<match>Merchant API</match> (id): <% if(merchant.id) { %> <%= merchant.id %> <% } %>',
-	    content: 'This is the content! 3',
+	    template: '<match>Merchant API</match> <dim>(id)</dim>: <% if(merchant.id) { %><%= merchant.id %><% } %>',
+	    content: '<% if(merchant.id) { %><%= merchant.id %><% } %>'
 	  },
 	  'merchantImage': {
-	    template: '<match>Merchant API</match> (logo): https://www.giveasyoulive.com/<% if(merchant.logo) { %> <%=merchant.logo %> <% } %>',
-	    content: 'This is the content! 4',
+	    template: '<match>Merchant API</match> <dim>(logo)</dim>: https://www.giveasyoulive.com<% if(merchant.logo) { %><%=merchant.logo %><% } %>',
+	    content: 'https://www.giveasyoulive.com<% if(merchant.logo) { %><%=merchant.logo %><% } %>'
 	  },
 	  'merchantStoreUrl': {
-	    template: '<match>Merchant API </match><dim>(url)</dim>: https://www.giveasyoulive.com/store/<% if(merchant.uri) { %> <%=merchant.uri %> <% } %>',
-	    content: 'This is the content! 5',
+	    template: '<match>Merchant API </match><dim>(url)</dim>: https://www.giveasyoulive.com/store/<% if(merchant.uri) { %><%=merchant.uri %><% } %>',
+	    content: 'https://www.giveasyoulive.com/store/<% if(merchant.uri) { %><%=merchant.uri %><% } %>',
 	  },
 	  'causeName': {
-	    template: '<match>Cause API</match> <dim>(name)</dim>: <% if(cause.name) { %> <%= cause.name %> <% } %>',
-	    content: 'This is the content! 6',
+	    template: '<match>Cause API</match> <dim>(name)</dim>: <% if(cause.name) { %><%= cause.name %><% } %>',
+	    content: '<% if(cause.name) { %><%= cause.name %><% } %>'
 	  },
 	  'causeId': {
-	    template: '<match>Cause API</match> <dim>(id)</dim>:<% if(cause.id) { %> <%= cause.id %> <% } %>',
-	    content: 'This is the content! 7',
+	    template: '<match>Cause API</match> <dim>(id)</dim>: <% if(cause.id) { %><%= cause.id %><% } %>',
+	    content: '<% if(cause.id) { %><%= cause.id %><% } %>'
 	  },
 	  'causeImage': {
-	    template: '<match>Cause API</match>: <% if(cause.image) { %> <%= cause.image %> <% } %>',
-	    content: 'This is the content! 8',
+	    template: '<match>Cause API</match> <dim>(image)</dim>: <% if(cause.image) { %><%= cause.image %><% } %>',
+	    content: '<% if(cause.image) { %><%= cause.image %><% } %>'
 	  },
 	  'causeJoinUrl': {
-	    template: '<match>Cause API</match> (url): <% if(cause.url) { %> <%= cause.url %> <% } %>',
-	    content: 'This is the content! 9',
+	    template: '<match>Cause API</match> <dim>(url)</dim>: <% if(cause.url) { %><%= cause.url %><% } %>',
+	    content: '<% if(cause.url) { %><%= cause.url %><% } %>'
 	  },
 	  'causeWebsiteUrl': {
-	    template: '<match>Cause API</match> (seo): <% if(cause.seo) { %> <%= cause.seo %> <% } %>',
-	    content: 'This is the content! 10',
+	    template: '<match>Cause API</match> <dim>(seo)</dim>: <% if(cause.seo) { %><%= cause.seo %><% } %>',
+	    content: '<% if(cause.seo) { %><%= cause.seo %><% } %>'
 	  }
 	}
 };
