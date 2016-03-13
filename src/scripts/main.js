@@ -1,53 +1,52 @@
-var $ = require('jquery');
 var config = require('./config');
-var querystring = require('querystring');
-var Query = require('./query');
-var utils = require('./utils');
+
 var CauseService = require('./services/cause');
 var MerchantService = require('./services/merchant');
 var CauseMerchantService = require('./services/causeMerchant');
+
+var Query = require('./query');
 var Suggestion = require('./suggestion');
 
 var API_TYPES = config.API_TYPES;
-var ENDPOINTS = config.ENDPOINTS;
-var query = utils.query;
-var get = utils.get;
-var MerchantApiResponseTransformer = utils.transformers.merchant;
-var CauseApiResponseTransformer = utils.transformers.cause;
-var determineQueryType = utils.determineQueryType;
-var TEMPLATES = config.TEMPLATES;
-var TEMPLATE_START_TAG = config.TEMPLATE_START_TAG;
-var TEMPLATE_END_TAG = config.TEMPLATE_END_TAG;
-var getTemplate = utils.getTemplate;
-var createTemplate = utils.createTemplate;
-
-
-
+var DATA_TYPES = config.DATA_TYPES;
 
 chrome.omnibox.onInputChanged.addListener(
   function(text, addSuggestions) {
+    if(!text) {
+      return;
+    }
 
     // Parse the user input into something useful
     var q = Query.parse(text);
 
+    console.log(q);
+
     // Call different APIs based on the user input
-    switch(q.type) {
+    switch(q.apiType) {
       case API_TYPES.MERCHANT:
-       MerchantService.get(q).then(function(response) {
-          addSuggestions(Suggestion.buildSuggestions(response[0], q));
-        });
+
+       MerchantService.getFirst(q.value).then(function(response) {
+          addSuggestions(Suggestion.buildSuggestions({
+            merchant: response.docs[0]
+          }, q));
+       });
 
         break;
       case API_TYPES.CAUSE:
-        CauseService.get(q).then(function(response) {
-          addSuggestions(Suggestion.buildSuggestions(response[0], q));
+        CauseService.getFirst(q.value).then(function(response) {
+          addSuggestions(Suggestion.buildSuggestions({
+            cause: response.docs[0]
+          }, q));
         });
 
         break;
       case API_TYPES.UNIVERSAL:
-        CauseMerchantService.get(q).then(function(response) {
-          addSuggestions(Suggestion.buildSuggestions(response[0], q));
-        });     
+        CauseMerchantService.get(q.value).then(function(response) {
+          addSuggestions(Suggestion.buildSuggestions({
+            cause: response.cause.docs[0],
+            merchant: response.merchant.docs[0],
+          }, q));
+        });
         break;
       default:
         break;

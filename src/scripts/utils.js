@@ -1,73 +1,37 @@
+/**
+ *  Utilities.
+ *
+ *  @author danielmoffat
+ */
+
 module.exports = {
-
-	getTemplate: function getTemplate(key) {
-	  return TEMPLATES[key];
-	},
-
-	// todo: use an actual templating engine
-	createTemplate: function createTemplate(template, model) {
-	  for(var key in model) {
-	    template = template.split(TEMPLATE_START_TAG + key + TEMPLATE_END_TAG).join(model[key]);
-	  }
-
-	  return template;
-	},
-
-	determineQueryType: function determineQueryType(query) {
-	  var types = {
-	    NUMBER: 'number',
-	    STRING: 'string'
-	  };
-
-	  return isNaN(parseInt(query, 10)) ? types.STRING : types.NUMBER;
-	},
-
-	query: function query(queryObject) {
-	  var type = queryObject.type;
-	  var searchQuery = queryObject.value;
-
-	  if(queryObject.dataType === 'number') {
-	    searchQuery = 'id:' + searchQuery;
-	  }
-
-	  return ENDPOINTS[type].split('{$query$}').join(searchQuery);
-	},
-
-	get: function get(url) {
-	  return $.ajax({
-	    method: 'GET',
-	    url: url
-	  });
-	},
-
-	transformers: {
-		merchant: (function() {
-
-			function MerchantApiResponseTransformer(response) {
-			  this.response = response.result;
-			}
-
-			MerchantApiResponseTransformer.prototype.transform = function() {
-			  return this.response.doc && this.response.doc.length ? this.response.doc : [this.response.doc];
-			};
-
-			return MerchantApiResponseTransformer;
-
-		})(),
-		cause: (function () {
-			function CauseApiResponseTransformer(response) {
-			  this.response = response;
-			}
-
-			CauseApiResponseTransformer.prototype.transform = function() {
-			  if(this.response.doc) {
-			    return this.response.doc.length ? this.response.doc : [this.response.doc];   
-			  }
-			};
-
-			return CauseApiResponseTransformer;
-		})() 
-	},
-
+  capitalise: capitalise,
+  // todo: parse queryObject and generate the templateList string dynamically
+  getTemplateListFromQueryObject: getTemplateListFromQueryObject
 
 };
+
+var config = require('./config');
+var API_TYPES = config.API_TYPES;
+var DATA_TYPES = config.DATA_TYPES;
+
+/**
+ * Capitalise a string
+ * @param  {String} str The string to capitalise.
+ * @return {String}     The string, capitalised.
+ */
+function capitalise(str) {
+  return str.charAt(0).toUpperCase() + str.substring(1);
+}
+
+/**
+ * Get the templates to use from the specified queryObject.
+ * @param  {Object} queryObject The query object (obtained from Query.parse('My query'))
+ * @return {String}             The template list key (which maps to a field in the config containing an array of templates)
+ */
+function getTemplateListFromQueryObject(queryObject) {
+    var apiType = queryObject.apiType;
+    var dataType = capitalise(queryObject.dataType);
+
+    return config.TEMPLATES.conf[apiType + dataType + 'Templates'];
+}

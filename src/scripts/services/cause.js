@@ -1,4 +1,4 @@
-/** 
+/**
  *  A simple service for making API requests to the cause API (defined in config.js/ENDPOINTS/cause).
  *
  *  Prefer to use `get` over `getByName` or `getById` as `get` will determine which method to use
@@ -13,7 +13,7 @@
  *
  *  // Uses getByName
  *  get('cancer research uk');
- * 
+ *
  * 	@author danielmoffat
  */
 
@@ -45,7 +45,7 @@ function getThenLog(query) {
 
 /**
  * Helper function that ties all the other parts together.
- * 
+ *
  * @param  {String} query The search query.
  * @return {Object}       The cause object(s) if found or null.
  */
@@ -61,7 +61,7 @@ function getFirst(query) {
 	return get(query).then(function(resp) {
 		return {
 			numFound: 1,
-			docs: [resp.docs[0]]
+      docs: [resp.docs.length ? resp.docs[0] : resp.docs]
 		};
 	});
 }
@@ -72,13 +72,13 @@ function getFirst(query) {
  * @return {void}
  */
 function defaultErrorHandler(error) {
-	console.log('Something just went wrong.')
+	console.log('Something just went wrong.');
 	console.log(err);
 }
 
 /**
  * Parses the response into a suitable object format. Allowing us to normalise return values
- * between different APIs. 
+ * between different APIs.
  *
  * @param  {Object} response The API response.
  * @return {Object}          The transformed API response.
@@ -97,7 +97,7 @@ function transform(response) {
 	// For some reason in the response if there is only one result
 	// an object is returned (instead of 1 item in an array), if there are no
 	// results the doc field is not even present.
-	// 
+	//
 	// By sorting it out here we avoid having to do so in the code that uses this service.
 	if(response.numFound === 0) {
 		response.docs = [];
@@ -159,7 +159,7 @@ function makeApiRequest(query) {
 }
 
 /**
- * Get the query function to use. 
+ * Get the query function to use.
  * @param  {String} query The search query to analyse.
  * @return {Function} The query function.
  */

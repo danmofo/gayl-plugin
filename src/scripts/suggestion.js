@@ -1,38 +1,57 @@
-var Suggestion = {
-  create: function(content, description) {
-    var suggestion = {};
-    if(arguments.length === 1) {
-      suggestion.description = content;
-    } else {
-      suggestion.content = content;
-      suggestion.description = description;
-    }
+/**
+ *    @author danielmoffat
+ */
 
-    return suggestion;
-  },
-  // Build a list of Suggestion objects from the specified model + query
-  // 
-  buildSuggestions: function(model, queryObject) {
-    var suggestions = [];
-
-    templates = {
-      merchant: [queryObject.dataType === 'number' ? TEMPLATES.merchantName : TEMPLATES.merchantId, TEMPLATES.merchantStoreUrl, TEMPLATES.merchantImage],
-      cause: [queryObject.dataType === 'number' ? TEMPLATES.causeName : TEMPLATES.causeId, TEMPLATES.causeJoinUrl, TEMPLATES.causeWebsiteUrl],
-      universal: [TEMPLATES.causeName]
-    }[queryObject.type];
-
-    console.log('Building suggestions for..', templates, 'using..', model);
-
-    // Loop around each template and fill in the required information
-    templates.forEach(function(template) {
-      var filledTemplate = createTemplate(template.template, model);
-      var suggestion = Suggestion.create(template.content, filledTemplate);
-
-      suggestions.push(suggestion);
-    });
-
-    return suggestions;
-  }
+module.exports = {
+  create: create,
+  buildSuggestions: buildSuggestions
 };
 
-module.exports = Suggestion;
+var config = require('./config');
+var utils = require('./utils');
+var ejs = require('ejs');
+var templateRender = ejs.render;
+
+var DATA_TYPES = config.DATA_TYPES;
+
+/**
+ * Creates a suggestion for chrome's omnibox. https://developer.chrome.com/extensions/omnibox#type-SuggestResult
+ * @param  {String} content     The content  that is put in the URL bar.
+ * @param  {String} description The text that is displayed on the dropdown.
+ * @return {Object}         The suggestion.
+ */
+function create(content, description) {
+  var suggestion = {};
+
+  suggestion.content = content;
+  suggestion.description = description ? description : content;
+
+  return suggestion;
+}
+
+/**
+ * Build a list of suggestions for the omnibox.
+ * @param  {Object} model       The model used for templates.
+ * @param  {Query} queryObject  The query object.
+ * @return {Array}              List of suggestions.
+ */
+function buildSuggestions(model, queryObject) {
+  var suggestions = [];
+
+  var templateKeys = utils.getTemplateListFromQueryObject(queryObject);
+
+  console.log('Building suggestions with...');
+  console.log(model, queryObject);
+
+  templateKeys.forEach(function(key) {
+    var entry = config.TEMPLATES[key];
+    var template = templateRender(entry.template, model);
+    var content = entry.content;
+    suggestions.push(create(content, template));
+  });
+
+  console.log(suggestions);
+
+
+  return suggestions;
+}

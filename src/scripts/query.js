@@ -16,7 +16,10 @@
 module.exports = Query;
 
 var isNumber = require('is-number');
-var API_TYPES = require('./config').API_TYPES;
+var config = require('./config');
+
+var DATA_TYPES = config.DATA_TYPES;
+var API_TYPES = config.API_TYPES;
 
 /**
  * Representation of an omnibox query entered by the user.
@@ -24,8 +27,9 @@ var API_TYPES = require('./config').API_TYPES;
  * @param {String} apiType The API type this query belongs to.
  */
 function Query(value, apiType) {
+  console.log(value, apiType);
   this.apiType = apiType || API_TYPES.UNIVERSAL;
-  this.value = value;
+  this.value = value || '';
   this.dataType = this.determineDataType();
 }
 
@@ -34,12 +38,7 @@ function Query(value, apiType) {
  * @return {String} The data type.
  */
 Query.prototype.determineDataType = function() {
-  var types = {
-    NUMBER: 'number',
-    STRING: 'string'
-  };
-
-  return isNumber(this.value) ? types.NUMBER : types.STRING;
+  return isNumber(this.value) ? DATA_TYPES.NUMBER : DATA_TYPES.STRING;
 };
 
 /**
@@ -53,6 +52,8 @@ Query.parse = function parse(query) {
   // Split the query up to find out if a command was used
   var bits = query.split(' ');
   var apiType = API_TYPES.UNIVERSAL;
+
+  console.log(bits);
 
   // Determine the API from the query
   if(bits.length > 1) {
