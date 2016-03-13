@@ -59,8 +59,5 @@ function buildSuggestions(model, queryObject) {
     suggestions.push(create(content, template));
   });
 
-  console.log(suggestions);
-
-
   return suggestions;
 }

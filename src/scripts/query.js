@@ -53,8 +53,6 @@ Query.parse = function parse(query) {
   var bits = query.split(' ');
   var apiType = API_TYPES.UNIVERSAL;
 
-  console.log(bits);
-
   // Determine the API from the query
   if(bits.length > 1) {
     switch(bits[0]) {
@@ -68,6 +66,15 @@ Query.parse = function parse(query) {
         apiType = API_TYPES.UNIVERSAL;
     }
   }
+
+  Query.prototype.toString = function toString() {
+    var out = '[Query ';
+    out += 'value=' + this.value + ',';
+    out += 'apiType=' + this.apiType + ',';
+    out += 'dataType=' + this.dataType;
+    out += ']';
+    return out;
+  };
 
   // The bits array always contains the query as the last value (and the command as the first, if its there)
   return new Query(bits.pop(), apiType);

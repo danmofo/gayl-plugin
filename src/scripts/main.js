@@ -28,7 +28,7 @@ chrome.omnibox.onInputChanged.addListener(
     switch(q.apiType) {
       case API_TYPES.MERCHANT:
         MerchantService.get(q.value).then(function(response) {
-          chrome.omnibox.setDefaultSuggestion(Suggestion.create('Merchant API, ' + response.numFound + ' result(s).'));
+          chrome.omnibox.setDefaultSuggestion(Suggestion.create('Merchant API: ' + response.numFound + ' result(s) for ' + q.value));
           addSuggestions(Suggestion.buildSuggestions({
             merchant: response.docs[0]
           }, q));
@@ -38,7 +38,8 @@ chrome.omnibox.onInputChanged.addListener(
       case API_TYPES.CAUSE:
 
         CauseService.get(q.value).then(function(response) {
-          chrome.omnibox.setDefaultSuggestion(Suggestion.create('Cause API, ' + response.numFound + ' result(s).'));
+          console.log(response);
+          chrome.omnibox.setDefaultSuggestion(Suggestion.create('Cause API: ' + response.numFound + ' result(s) for ' + q.value));
           addSuggestions(Suggestion.buildSuggestions({
             cause: response.docs[0]
           }, q));

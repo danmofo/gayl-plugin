@@ -8,7 +8,7 @@ Basic usage:
 
 `gl <query>`
 
-Where **query** can be any of the following:
+Where `<query>` can be any of the following:
 
 - `1517` (EC ID)
 - `Starlight` (Charity name)
@@ -22,6 +22,15 @@ Prefix the query with either `m` or `c` to limit the search to that API. Adding 
 - `gl m Amazon`, searches merchant api for `Amazon`
 - `gl c 15175`, searches cause api for `15175`
 
+Installing
+---
+
+You need [this](https://github.com/danmofo/base-project) project's `Gruntfile`.
+
+1. Checkout source.
+2. `grunt devChromeExtension --src='/whereever/you/checked/it/out'`.
+3. Open `chrome://extensions` -> `'Load unpacked extensions'` -> `/src/extension`.
+4. Open a new tab and try it.
 
 Limitations:
 ---
@@ -31,5 +40,5 @@ Limitations:
 Todo:
 ---
 
-- Clean up code.
 - Add other APIs
+- Replace huge libraries with smaller ones! The output size right now is hilariously bad.

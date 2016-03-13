@@ -16,7 +16,9 @@ module.exports = {
   // Templates for each omnibox item
 	TEMPLATES:  {
     conf: {
-      // Templates list to use for each query and query type. We need this facility
+      // A template list is a list of keys (referencing templates in config.js/TEMPLATES)
+      //
+      // Template list to use for each query and query type. We need this facility
       // because it's pretty silly to waste an omnibox slot showing the ID you already know!
       //
       // Examples:
@@ -27,27 +29,31 @@ module.exports = {
       // Input: 'c Starlight'
       // Template list used: causeStringTemplates
       //
-      // Inpit: 'Amazon'
+      // Input: 'Amazon'
       // Template list used: universalStringTemplates
       merchantStringTemplates: [
         'merchantId',
         'merchantStoreUrl',
-        'merchantImage'
+        'merchantImage',
+        'merchantRates'
       ],
       merchantNumberTemplates: [
         'merchantName',
         'merchantStoreUrl',
-        'merchantImage'
+        'merchantImage',
+        'merchantRates'
       ],
       causeNumberTemplates: [
         'causeName',
         'causeJoinUrl',
-        'causeWebsiteUrl'
+        'causeWebsiteUrl',
+        'causeGaylPage'
       ],
       causeStringTemplates: [
         'causeId',
         'causeJoinUrl',
-        'causeWebsiteUrl'
+        'causeWebsiteUrl',
+        'causeGaylPage'
       ],
       universalStringTemplates: [
         'causeId',
@@ -57,6 +63,11 @@ module.exports = {
         'causeName',
         'merchantName'
       ]
+    },
+
+    'merchantRates': {
+      template: '<match>Merchant API</match> <dim>(rates)</dim>: <% if(merchant.commissions) { merchant.commissions.forEach(function(c) {if(c["@category"]) { %><%= c["@category"] %> - <%= c["@value"] %> |<% }})} %>',
+      content: '<% if(merchant.commissions) { %><%= merchant.name %><% } %>'
     },
 	  'merchantName': {
 	    template: '<match>Merchant API</match> <dim>(name)</dim>: <% if(merchant.name) { %><%= merchant.name %><% } %>',
@@ -71,8 +82,8 @@ module.exports = {
 	    content: 'https://www.giveasyoulive.com<% if(merchant.logo) { %><%=merchant.logo %><% } %>'
 	  },
 	  'merchantStoreUrl': {
-	    template: '<match>Merchant API </match><dim>(url)</dim>: https://www.giveasyoulive.com/store/<% if(merchant.uri) { %><%=merchant.uri %><% } %>',
-	    content: 'https://www.giveasyoulive.com/store/<% if(merchant.uri) { %><%=merchant.uri %><% } %>',
+	    template: '<match>Merchant API </match><dim>(url)</dim>: https://www.giveasyoulive.com/stores/<% if(merchant.uri) { %><%=merchant.uri %><% } %>',
+	    content: 'https://www.giveasyoulive.com/stores/<% if(merchant.uri) { %><%=merchant.uri %><% } %>',
 	  },
 	  'causeName': {
 	    template: '<match>Cause API</match> <dim>(name)</dim>: <% if(cause.name) { %><%= cause.name %><% } %>',
@@ -93,6 +104,10 @@ module.exports = {
 	  'causeWebsiteUrl': {
 	    template: '<match>Cause API</match> <dim>(seo)</dim>: <% if(cause.seo) { %><%= cause.seo %><% } %>',
 	    content: '<% if(cause.seo) { %><%= cause.seo %><% } %>'
-	  }
+	  },
+    'causeGaylPage': {
+      template: '<match>Cause API</match> <dim>(GAYL join link)</dim>: <% if(cause.seo) { %>https://www.giveasyoulive.com/join/<%= cause.seo %><% } %>',
+      content: '<% if(cause.seo) { %>https://www.giveasyoulive.com/join/<%= cause.seo %><% } %>'
+    }
 	}
 };

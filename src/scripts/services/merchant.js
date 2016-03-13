@@ -35,6 +35,7 @@ var MERCHANT_ENDPOINT = require('../config').ENDPOINTS.merchant;
 var defaults = {
 	start: 0,
 	rows: 5,
+  cid: 1,
 	wt: 'everyclick',
 	fq: 'subscriber:1',
 	facet: true,
