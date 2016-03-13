@@ -27,7 +27,6 @@ var API_TYPES = config.API_TYPES;
  * @param {String} apiType The API type this query belongs to.
  */
 function Query(value, apiType) {
-  console.log(value, apiType);
   this.apiType = apiType || API_TYPES.UNIVERSAL;
   this.value = value || '';
   this.dataType = this.determineDataType();

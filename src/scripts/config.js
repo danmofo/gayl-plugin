@@ -1,4 +1,6 @@
 module.exports = {
+  // Log what its doing?
+  logging: true,
 	API_TYPES: {
 	  MERCHANT: 'merchant',
 	  CAUSE: 'cause',
@@ -13,7 +15,7 @@ module.exports = {
 	  merchant: 'https://www.giveasyoulive.com/merchants/select',
 	  cause: 'https://workwithus.giveasyoulive.com/charity/select',
 	},
-  // Templates for each omnibox item
+  // Templates for each omnibox item, I really dislike the embedded logic in here...
 	TEMPLATES:  {
     conf: {
       // A template list is a list of keys (referencing templates in config.js/TEMPLATES)
@@ -66,48 +68,48 @@ module.exports = {
     },
 
     'merchantRates': {
-      template: '<match>Merchant API</match> <dim>(rates)</dim>: <% if(merchant.commissions) { merchant.commissions.forEach(function(c) {if(c["@category"]) { %><%= c["@category"] %> - <%= c["@value"] %> |<% }})} %>',
-      content: '<% if(merchant.commissions) { %><%= merchant.name %><% } %>'
+      template: '<match>Merchant API</match> <dim>(rates)</dim>: <% if(merchant && merchant.commissions) { merchant.commissions.forEach(function(c) {if(c["@category"]) { %><%= c["@category"] %> - <%= c["@value"] %> |<% }})} %>',
+      content: '<% if(merchant && merchant.commissions) { %><%= merchant.name %><% } %>'
     },
 	  'merchantName': {
-	    template: '<match>Merchant API</match> <dim>(name)</dim>: <% if(merchant.name) { %><%= merchant.name %><% } %>',
-	    content: '<% if(merchant.name) { %><%= merchant.name %><% } %>'
+	    template: '<match>Merchant API</match> <dim>(name)</dim>: <% if(merchant && merchant.name) { %><%= merchant.name %><% } else { %>None found!<% } %>',
+	    content: '<% if(merchant && merchant.name) { %><%= merchant.name %><% } else { %>None found! merchantName<% } %>'
 	  },
 	  'merchantId': {
-	    template: '<match>Merchant API</match> <dim>(id)</dim>: <% if(merchant.id) { %><%= merchant.id %><% } %>',
-	    content: '<% if(merchant.id) { %><%= merchant.id %><% } %>'
+	    template: '<match>Merchant API</match> <dim>(id)</dim>: <% if(merchant && merchant.id) { %><%= merchant.id %><% } else { %>None found!<% } %>',
+	    content: '<% if(merchant && merchant.id) { %><%= merchant.id %><% } else { %>None found! merchantName<% } %>'
 	  },
 	  'merchantImage': {
-	    template: '<match>Merchant API</match> <dim>(logo)</dim>: https://www.giveasyoulive.com<% if(merchant.logo) { %><%=merchant.logo %><% } %>',
-	    content: 'https://www.giveasyoulive.com<% if(merchant.logo) { %><%=merchant.logo %><% } %>'
+	    template: '<match>Merchant API</match> <dim>(logo)</dim>: https://www.giveasyoulive.com<% if(merchant && merchant.logo) { %><%=merchant.logo %><% } else { %>None found!<% } %>',
+	    content: 'https://www.giveasyoulive.com<% if(merchant && merchant.logo) { %><%=merchant.logo %><% } %>'
 	  },
 	  'merchantStoreUrl': {
-	    template: '<match>Merchant API </match><dim>(url)</dim>: https://www.giveasyoulive.com/stores/<% if(merchant.uri) { %><%=merchant.uri %><% } %>',
-	    content: 'https://www.giveasyoulive.com/stores/<% if(merchant.uri) { %><%=merchant.uri %><% } %>',
+	    template: '<match>Merchant API </match><dim>(url)</dim>: https://www.giveasyoulive.com/stores/<% if(merchant && merchant.uri) { %><%=merchant.uri %><% } else { %>None found!<% } %>',
+	    content: 'https://www.giveasyoulive.com/stores/<% if(merchant && merchant.uri) { %><%=merchant.uri %><% } %>',
 	  },
 	  'causeName': {
-	    template: '<match>Cause API</match> <dim>(name)</dim>: <% if(cause.name) { %><%= cause.name %><% } %>',
-	    content: '<% if(cause.name) { %><%= cause.name %><% } %>'
+	    template: '<match>Cause API</match> <dim>(name)</dim>: <% if(cause && cause.name) { %><%= cause.name %><% } else { %>None found!<% } %>',
+	    content: '<% if(cause && cause.name) { %><%= cause.name %><% } else { %>None found! causeName<% } %>'
 	  },
 	  'causeId': {
-	    template: '<match>Cause API</match> <dim>(id)</dim>: <% if(cause.id) { %><%= cause.id %><% } %>',
-	    content: '<% if(cause.id) { %><%= cause.id %><% } %>'
+	    template: '<match>Cause API</match> <dim>(id)</dim>: <% if(cause && cause.id) { %><%= cause.id %><% } else { %>None found!<% } %>',
+	    content: '<% if(cause && cause.id) { %><%= cause.id %><% } else { %>None found! causeId<% } %>'
 	  },
 	  'causeImage': {
-	    template: '<match>Cause API</match> <dim>(image)</dim>: <% if(cause.image) { %><%= cause.image %><% } %>',
-	    content: '<% if(cause.image) { %><%= cause.image %><% } %>'
+	    template: '<match>Cause API</match> <dim>(image)</dim>: <% if(cause && cause.image) { %><%= cause.image %><% } else { %>None found!<% } %>',
+	    content: '<% if(cause && cause.image) { %><%= cause.image %><% } %>'
 	  },
 	  'causeJoinUrl': {
-	    template: '<match>Cause API</match> <dim>(url)</dim>: <% if(cause.url) { %><%= cause.url %><% } %>',
-	    content: '<% if(cause.url) { %><%= cause.url %><% } %>'
+	    template: '<match>Cause API</match> <dim>(url)</dim>: <% if(cause && cause.url) { %><%= cause.url %><% } else { %>None found!<% } %>',
+	    content: '<% if(cause && cause.url) { %><%= cause.url %><% } else { %>None found!<% } %>'
 	  },
 	  'causeWebsiteUrl': {
-	    template: '<match>Cause API</match> <dim>(seo)</dim>: <% if(cause.seo) { %><%= cause.seo %><% } %>',
-	    content: '<% if(cause.seo) { %><%= cause.seo %><% } %>'
+	    template: '<match>Cause API</match> <dim>(seo)</dim>: <% if(cause && cause.seo) { %><%= cause.seo %><% } else { %>None found!<% } %>',
+	    content: '<% if(cause && cause.seo) { %><%= cause.seo %><% } %>'
 	  },
     'causeGaylPage': {
-      template: '<match>Cause API</match> <dim>(GAYL join link)</dim>: <% if(cause.seo) { %>https://www.giveasyoulive.com/join/<%= cause.seo %><% } %>',
-      content: '<% if(cause.seo) { %>https://www.giveasyoulive.com/join/<%= cause.seo %><% } %>'
+      template: '<match>Cause API</match> <dim>(GAYL join link)</dim>: <% if(cause && cause.seo) { %>https://www.giveasyoulive.com/join/<%= cause.seo %><% } else { %>None found!<% } %>',
+      content: '<% if(cause && cause.seo) { %>https://www.giveasyoulive.com/join/<%= cause.seo %><% } %>'
     }
 	}
 };

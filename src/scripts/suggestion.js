@@ -9,9 +9,11 @@ module.exports = {
 
 var config = require('./config');
 var utils = require('./utils');
+var log = require('./log');
 var ejs = require('ejs');
-var templateRender = ejs.render;
 
+var templateRender = ejs.render;
+var API_TYPES = config.API_TYPES;
 var DATA_TYPES = config.DATA_TYPES;
 
 /**
@@ -47,10 +49,15 @@ function buildTemplate(model, templateKey) {
 function buildSuggestions(model, queryObject) {
   var suggestions = [];
 
+  // THis really limits re-use, suggestions shouldn't be built if there isn't a suitable model
+  if(queryObject.apiType !== API_TYPES.UNIVERSAL && !model[queryObject.apiType]) {
+    log('The required model properties are missing, exiting..');
+    return suggestions;
+  }
+
   var templateKeys = utils.getTemplateListFromQueryObject(queryObject);
 
-  console.log('Building suggestions with...');
-  console.log(model, queryObject);
+  log('Building suggestions using: ', model, queryObject, templateKeys);
 
   templateKeys.forEach(function(key) {
     var entry = config.TEMPLATES[key];
@@ -58,6 +65,8 @@ function buildSuggestions(model, queryObject) {
     var content = templateRender(entry.content, model);
     suggestions.push(create(content, template));
   });
+
+  log('Created suggestions: ', suggestions);
 
   return suggestions;
 }

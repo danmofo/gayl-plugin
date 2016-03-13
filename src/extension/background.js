@@ -67069,6 +67069,8 @@ module.exports = Request
 }).call(this,require('_process'),require("buffer").Buffer)
 },{"./lib/auth":264,"./lib/cookies":265,"./lib/getProxyFromURI":266,"./lib/har":267,"./lib/helpers":268,"./lib/multipart":269,"./lib/oauth":270,"./lib/querystring":271,"./lib/redirect":272,"./lib/tunnel":273,"_process":219,"aws-sign2":274,"aws4":275,"bl":280,"buffer":17,"caseless":291,"extend":294,"forever-agent":295,"form-data":296,"hawk":325,"http":238,"http-signature":326,"https":214,"is-typedarray":371,"mime-types":374,"stream":237,"stringstream":383,"url":248,"util":250,"zlib":16}],393:[function(require,module,exports){
 module.exports = {
+  // Log what its doing?
+  logging: true,
 	API_TYPES: {
 	  MERCHANT: 'merchant',
 	  CAUSE: 'cause',
@@ -67083,7 +67085,7 @@ module.exports = {
 	  merchant: 'https://www.giveasyoulive.com/merchants/select',
 	  cause: 'https://workwithus.giveasyoulive.com/charity/select',
 	},
-  // Templates for each omnibox item
+  // Templates for each omnibox item, I really dislike the embedded logic in here...
 	TEMPLATES:  {
     conf: {
       // A template list is a list of keys (referencing templates in config.js/TEMPLATES)
@@ -67136,53 +67138,74 @@ module.exports = {
     },
 
     'merchantRates': {
-      template: '<match>Merchant API</match> <dim>(rates)</dim>: <% if(merchant.commissions) { merchant.commissions.forEach(function(c) {if(c["@category"]) { %><%= c["@category"] %> - <%= c["@value"] %> |<% }})} %>',
-      content: '<% if(merchant.commissions) { %><%= merchant.name %><% } %>'
+      template: '<match>Merchant API</match> <dim>(rates)</dim>: <% if(merchant && merchant.commissions) { merchant.commissions.forEach(function(c) {if(c["@category"]) { %><%= c["@category"] %> - <%= c["@value"] %> |<% }})} %>',
+      content: '<% if(merchant && merchant.commissions) { %><%= merchant.name %><% } %>'
     },
 	  'merchantName': {
-	    template: '<match>Merchant API</match> <dim>(name)</dim>: <% if(merchant.name) { %><%= merchant.name %><% } %>',
-	    content: '<% if(merchant.name) { %><%= merchant.name %><% } %>'
+	    template: '<match>Merchant API</match> <dim>(name)</dim>: <% if(merchant && merchant.name) { %><%= merchant.name %><% } else { %>None found!<% } %>',
+	    content: '<% if(merchant && merchant.name) { %><%= merchant.name %><% } else { %>None found! merchantName<% } %>'
 	  },
 	  'merchantId': {
-	    template: '<match>Merchant API</match> <dim>(id)</dim>: <% if(merchant.id) { %><%= merchant.id %><% } %>',
-	    content: '<% if(merchant.id) { %><%= merchant.id %><% } %>'
+	    template: '<match>Merchant API</match> <dim>(id)</dim>: <% if(merchant && merchant.id) { %><%= merchant.id %><% } else { %>None found!<% } %>',
+	    content: '<% if(merchant && merchant.id) { %><%= merchant.id %><% } else { %>None found! merchantName<% } %>'
 	  },
 	  'merchantImage': {
-	    template: '<match>Merchant API</match> <dim>(logo)</dim>: https://www.giveasyoulive.com<% if(merchant.logo) { %><%=merchant.logo %><% } %>',
-	    content: 'https://www.giveasyoulive.com<% if(merchant.logo) { %><%=merchant.logo %><% } %>'
+	    template: '<match>Merchant API</match> <dim>(logo)</dim>: https://www.giveasyoulive.com<% if(merchant && merchant.logo) { %><%=merchant.logo %><% } else { %>None found!<% } %>',
+	    content: 'https://www.giveasyoulive.com<% if(merchant && merchant.logo) { %><%=merchant.logo %><% } %>'
 	  },
 	  'merchantStoreUrl': {
-	    template: '<match>Merchant API </match><dim>(url)</dim>: https://www.giveasyoulive.com/stores/<% if(merchant.uri) { %><%=merchant.uri %><% } %>',
-	    content: 'https://www.giveasyoulive.com/stores/<% if(merchant.uri) { %><%=merchant.uri %><% } %>',
+	    template: '<match>Merchant API </match><dim>(url)</dim>: https://www.giveasyoulive.com/stores/<% if(merchant && merchant.uri) { %><%=merchant.uri %><% } else { %>None found!<% } %>',
+	    content: 'https://www.giveasyoulive.com/stores/<% if(merchant && merchant.uri) { %><%=merchant.uri %><% } %>',
 	  },
 	  'causeName': {
-	    template: '<match>Cause API</match> <dim>(name)</dim>: <% if(cause.name) { %><%= cause.name %><% } %>',
-	    content: '<% if(cause.name) { %><%= cause.name %><% } %>'
+	    template: '<match>Cause API</match> <dim>(name)</dim>: <% if(cause && cause.name) { %><%= cause.name %><% } else { %>None found!<% } %>',
+	    content: '<% if(cause && cause.name) { %><%= cause.name %><% } else { %>None found! causeName<% } %>'
 	  },
 	  'causeId': {
-	    template: '<match>Cause API</match> <dim>(id)</dim>: <% if(cause.id) { %><%= cause.id %><% } %>',
-	    content: '<% if(cause.id) { %><%= cause.id %><% } %>'
+	    template: '<match>Cause API</match> <dim>(id)</dim>: <% if(cause && cause.id) { %><%= cause.id %><% } else { %>None found!<% } %>',
+	    content: '<% if(cause && cause.id) { %><%= cause.id %><% } else { %>None found! causeId<% } %>'
 	  },
 	  'causeImage': {
-	    template: '<match>Cause API</match> <dim>(image)</dim>: <% if(cause.image) { %><%= cause.image %><% } %>',
-	    content: '<% if(cause.image) { %><%= cause.image %><% } %>'
+	    template: '<match>Cause API</match> <dim>(image)</dim>: <% if(cause && cause.image) { %><%= cause.image %><% } else { %>None found!<% } %>',
+	    content: '<% if(cause && cause.image) { %><%= cause.image %><% } %>'
 	  },
 	  'causeJoinUrl': {
-	    template: '<match>Cause API</match> <dim>(url)</dim>: <% if(cause.url) { %><%= cause.url %><% } %>',
-	    content: '<% if(cause.url) { %><%= cause.url %><% } %>'
+	    template: '<match>Cause API</match> <dim>(url)</dim>: <% if(cause && cause.url) { %><%= cause.url %><% } else { %>None found!<% } %>',
+	    content: '<% if(cause && cause.url) { %><%= cause.url %><% } else { %>None found!<% } %>'
 	  },
 	  'causeWebsiteUrl': {
-	    template: '<match>Cause API</match> <dim>(seo)</dim>: <% if(cause.seo) { %><%= cause.seo %><% } %>',
-	    content: '<% if(cause.seo) { %><%= cause.seo %><% } %>'
+	    template: '<match>Cause API</match> <dim>(seo)</dim>: <% if(cause && cause.seo) { %><%= cause.seo %><% } else { %>None found!<% } %>',
+	    content: '<% if(cause && cause.seo) { %><%= cause.seo %><% } %>'
 	  },
     'causeGaylPage': {
-      template: '<match>Cause API</match> <dim>(GAYL join link)</dim>: <% if(cause.seo) { %>https://www.giveasyoulive.com/join/<%= cause.seo %><% } %>',
-      content: '<% if(cause.seo) { %>https://www.giveasyoulive.com/join/<%= cause.seo %><% } %>'
+      template: '<match>Cause API</match> <dim>(GAYL join link)</dim>: <% if(cause && cause.seo) { %>https://www.giveasyoulive.com/join/<%= cause.seo %><% } else { %>None found!<% } %>',
+      content: '<% if(cause && cause.seo) { %>https://www.giveasyoulive.com/join/<%= cause.seo %><% } %>'
     }
 	}
 };
 
 },{}],394:[function(require,module,exports){
+var showLogging = require('./config').logging;
+
+/**
+ * Taken from http://stackoverflow.com/questions/9521921/why-does-console-log-apply-throw-an-illegal-invocation-error
+ *
+ * Ideally I'd like to replace this with console.log.apply(console, arguments).
+ *
+ */
+/* jshint evil: true */
+function consoleLogger() {
+    var i = -1, l = arguments.length, args = [], fn = 'console.log(args)';
+    while(++i<l){
+        args.push('args['+i+']');
+    }
+    fn = new Function('args',fn.replace(/args/,args.join(',')));
+    fn(arguments);
+}
+
+module.exports = showLogging ? consoleLogger : function() {};
+
+},{"./config":393}],395:[function(require,module,exports){
 var config = require('./config');
 
 var CauseService = require('./services/cause');
@@ -67191,6 +67214,7 @@ var CauseMerchantService = require('./services/causeMerchant');
 
 var Query = require('./query');
 var Suggestion = require('./suggestion');
+var log = require('./log');
 
 var API_TYPES = config.API_TYPES;
 var DATA_TYPES = config.DATA_TYPES;
@@ -67200,44 +67224,61 @@ var DATA_TYPES = config.DATA_TYPES;
  */
 chrome.omnibox.onInputChanged.addListener(
   function(text, addSuggestions) {
+
+    // Don't do anything if there isn't a query
     if(!text) {
+      log('No query found, exiting..');
       return;
     }
 
-    // Parse the user input into something useful
     var q = Query.parse(text);
 
-    console.log('Query: ' + q);
+    log('The query: ', q);
+
+    if(q.value === '') {
+      log('No query found, exiting...');
+      return;
+    }
 
     // Call different APIs based on the user input
     switch(q.apiType) {
       case API_TYPES.MERCHANT:
         MerchantService.get(q.value).then(function(response) {
           chrome.omnibox.setDefaultSuggestion(Suggestion.create('Merchant API: ' + response.numFound + ' result(s) for ' + q.value));
-          addSuggestions(Suggestion.buildSuggestions({
+          log(response.numFound + ' results found for ' + q.value);
+
+          var suggestions = Suggestion.buildSuggestions({
             merchant: response.docs[0]
-          }, q));
+          }, q);
+
+          addSuggestions(suggestions);
         });
         break;
 
       case API_TYPES.CAUSE:
 
         CauseService.get(q.value).then(function(response) {
-          console.log(response);
           chrome.omnibox.setDefaultSuggestion(Suggestion.create('Cause API: ' + response.numFound + ' result(s) for ' + q.value));
-          addSuggestions(Suggestion.buildSuggestions({
+          log(response.numFound + ' results found for ' + q.value);
+
+          var suggestions = Suggestion.buildSuggestions({
             cause: response.docs[0]
-          }, q));
+          }, q);
+
+          addSuggestions(suggestions);
         });
         break;
 
       case API_TYPES.UNIVERSAL:
         CauseMerchantService.get(q.value).then(function(response) {
           chrome.omnibox.setDefaultSuggestion(Suggestion.create('Cause / Merchant API.'));
-          addSuggestions(Suggestion.buildSuggestions({
+
+          var suggestions = Suggestion.buildSuggestions({
             cause: response.cause.docs[0],
             merchant: response.merchant.docs[0],
-          }, q));
+          }, q);
+
+          addSuggestions(suggestions);
         });
         break;
 
@@ -67247,7 +67288,7 @@ chrome.omnibox.onInputChanged.addListener(
 });
 
 /**
- * This event handler fires when you press ENTER on a suggestion
+ * This event handler fires when you press ENTER on a suggestion.
  */
 chrome.omnibox.onInputEntered.addListener(function(text) {
 
@@ -67259,7 +67300,7 @@ chrome.omnibox.onInputEntered.addListener(function(text) {
   }
 });
 
-},{"./config":393,"./query":395,"./services/cause":396,"./services/causeMerchant":397,"./services/merchant":398,"./suggestion":399}],395:[function(require,module,exports){
+},{"./config":393,"./log":394,"./query":396,"./services/cause":397,"./services/causeMerchant":398,"./services/merchant":399,"./suggestion":400}],396:[function(require,module,exports){
 /**
  *  Examples:
  *
@@ -67289,7 +67330,6 @@ var API_TYPES = config.API_TYPES;
  * @param {String} apiType The API type this query belongs to.
  */
 function Query(value, apiType) {
-  console.log(value, apiType);
   this.apiType = apiType || API_TYPES.UNIVERSAL;
   this.value = value || '';
   this.dataType = this.determineDataType();
@@ -67342,7 +67382,7 @@ Query.parse = function parse(query) {
   return new Query(bits.pop(), apiType);
 };
 
-},{"./config":393,"is-number":259}],396:[function(require,module,exports){
+},{"./config":393,"is-number":259}],397:[function(require,module,exports){
 /**
  *  A simple service for making API requests to the cause API (defined in config.js/ENDPOINTS/cause).
  *
@@ -67525,7 +67565,7 @@ function buildQuery(queryParams) {
 	return CAUSE_ENDPOINT + '?' + querystring.encode(merge(queryParams, defaults));
 }
 
-},{"../config":393,"bluebird":255,"is-number":259,"merge":262,"querystring":223,"request":263}],397:[function(require,module,exports){
+},{"../config":393,"bluebird":255,"is-number":259,"merge":262,"querystring":223,"request":263}],398:[function(require,module,exports){
 /**
  *  A simple service for making API requests to the cause/merchant API, which is just a service
  *  that ties the cause and merchant services together.
@@ -67554,7 +67594,7 @@ function get(query) {
   });
 }
 
-},{"./cause":396,"./merchant":398,"bluebird":255}],398:[function(require,module,exports){
+},{"./cause":397,"./merchant":399,"bluebird":255}],399:[function(require,module,exports){
 /**
  *  A simple service for making API requests to the merchant API (defined in config.js/ENDPOINTS/merchant).
  *
@@ -67744,7 +67784,7 @@ function buildQuery(queryParams) {
 	return MERCHANT_ENDPOINT + '?' + querystring.encode(merge(queryParams, defaults));
 }
 
-},{"../config":393,"bluebird":255,"is-number":259,"merge":262,"querystring":223,"request":263}],399:[function(require,module,exports){
+},{"../config":393,"bluebird":255,"is-number":259,"merge":262,"querystring":223,"request":263}],400:[function(require,module,exports){
 /**
  *    @author danielmoffat
  */
@@ -67756,9 +67796,11 @@ module.exports = {
 
 var config = require('./config');
 var utils = require('./utils');
+var log = require('./log');
 var ejs = require('ejs');
-var templateRender = ejs.render;
 
+var templateRender = ejs.render;
+var API_TYPES = config.API_TYPES;
 var DATA_TYPES = config.DATA_TYPES;
 
 /**
@@ -67794,10 +67836,15 @@ function buildTemplate(model, templateKey) {
 function buildSuggestions(model, queryObject) {
   var suggestions = [];
 
+  // THis really limits re-use, suggestions shouldn't be built if there isn't a suitable model
+  if(queryObject.apiType !== API_TYPES.UNIVERSAL && !model[queryObject.apiType]) {
+    log('The required model properties are missing, exiting..');
+    return suggestions;
+  }
+
   var templateKeys = utils.getTemplateListFromQueryObject(queryObject);
 
-  console.log('Building suggestions with...');
-  console.log(model, queryObject);
+  log('Building suggestions using: ', model, queryObject, templateKeys);
 
   templateKeys.forEach(function(key) {
     var entry = config.TEMPLATES[key];
@@ -67806,10 +67853,12 @@ function buildSuggestions(model, queryObject) {
     suggestions.push(create(content, template));
   });
 
+  log('Created suggestions: ', suggestions);
+
   return suggestions;
 }
 
-},{"./config":393,"./utils":400,"ejs":256}],400:[function(require,module,exports){
+},{"./config":393,"./log":394,"./utils":401,"ejs":256}],401:[function(require,module,exports){
 /**
  *  Utilities.
  *
@@ -67848,4 +67897,4 @@ function getTemplateListFromQueryObject(queryObject) {
     return config.TEMPLATES.conf[apiType + dataType + 'Templates'];
 }
 
-},{"./config":393}]},{},[394]);
+},{"./config":393}]},{},[395]);

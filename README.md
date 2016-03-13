@@ -6,6 +6,9 @@ Adds Give as you Live search APIs to Google Chrome's [omnibox](https://developer
 Basic usage:
 ---
 
+Demo:
+![GAYL Plugin demo](demo.gif?raw=true "GAYL Plugin demo")
+
 `gl <query>`
 
 Where `<query>` can be any of the following:
