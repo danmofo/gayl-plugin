@@ -35,11 +35,6 @@ function create(content, description) {
   return suggestion;
 }
 
-function buildTemplate(model, templateKey) {
-  var suggestion = {};
-  ctemplateRender(config.TEMPLATES[templateKey], model);
-}
-
 /**
  * Build a list of suggestions for the omnibox.
  * @param  {Object} model       The model used for templates.
@@ -57,7 +52,7 @@ function buildSuggestions(model, queryObject) {
 
   var templateKeys = utils.getTemplateListFromQueryObject(queryObject);
 
-  log('Building suggestions using: ', model, queryObject, templateKeys);
+  log('Building suggestions using: ', model, templateKeys);
 
   templateKeys.forEach(function(key) {
     var entry = config.TEMPLATES[key];

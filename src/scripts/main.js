@@ -48,7 +48,6 @@ chrome.omnibox.onInputChanged.addListener(
         break;
 
       case API_TYPES.CAUSE:
-
         CauseService.get(q.value).then(function(response) {
           chrome.omnibox.setDefaultSuggestion(Suggestion.create('Cause API: ' + response.numFound + ' result(s) for ' + q.value));
           log(response.numFound + ' results found for ' + q.value);

@@ -1,4 +1,6 @@
 /**
+ *  This class is responsible for parsing the user input.
+ *
  *  Examples:
  *
  *  Query.parse('m 2000');
