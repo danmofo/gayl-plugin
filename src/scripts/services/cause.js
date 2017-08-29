@@ -24,8 +24,8 @@ module.exports = {
 	getFirst: getFirst
 };
 
-var Promise = require('bluebird');
-var request = Promise.promisifyAll(require('request'));
+var Promise = require('es6-promise').Promise;
+var axios = require('axios');
 var querystring = require('querystring');
 var merge = require('merge');
 var isNumber = require('is-number');
@@ -73,7 +73,7 @@ function getFirst(query) {
  */
 function defaultErrorHandler(error) {
 	console.log('Something just went wrong.');
-	console.log(err);
+	console.log(error);
 }
 
 /**
@@ -124,11 +124,8 @@ function getByName(name) {
  * @return {Promise}      The response.
  */
 function makeApiRequest(query) {
-	return request.getAsync({
-		method: 'GET',
-		url: query
-	}).then(function(resp) {
-		return transform(JSON.parse(resp.body));
+	return axios.get(query).then(function(resp) {
+		return resp.data;
 	});
 }
 

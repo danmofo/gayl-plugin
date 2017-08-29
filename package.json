@@ -1,28 +1,24 @@
 {
   "name": "gayl-plugin",
   "version": "1.0.0",
-  "description": "Give as you Live search plugin ===",
+  "description": "Enhances the omnibox and allows you to search the GAYL Merchant and Cause API services.",
   "main": "index.js",
   "dependencies": {
-    "querystring": "^0.2.0",
-    "jquery": "^2.2.1"
-  },
-  "devDependencies": {
-    "bluebird": "^3.3.4",
+    "axios": "^0.16.2",
     "ejs": "^2.4.1",
+    "es6-promise": "^4.1.1",
     "is-number": "^2.1.0",
     "merge": "^1.2.0",
-    "request": "^2.69.0"
+    "querystring": "^0.2.0"
   },
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
+  "devDependencies": {},
+  "scripts": {},
   "repository": {
     "type": "git",
     "url": "git+https://github.com/danmofo/gayl-plugin.git"
   },
-  "author": "",
-  "license": "UNLICENSED",
+  "author": "Daniel Moffat",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/danmofo/gayl-plugin/issues"
   },

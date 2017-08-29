@@ -1,5 +1,4 @@
-Give as you Live search plugin
-===
+# Give as you Live Omnibox search plugin
 
 Adds Give as you Live search APIs to Google Chrome's [omnibox](https://developer.chrome.com/extensions/omnibox). Selecting an option adds the relevant part to the omnibox (e.g. "Merchant name: Amazon" would actually contain only `Amazon`) making it easy to look things up and copy things to the clipboard.
 
@@ -24,15 +23,19 @@ Prefix the query with either `m` or `c` to limit the search to that API. Adding 
 - `gl m Amazon`, searches merchant api for `Amazon`
 - `gl c 15175`, searches cause api for `15175`
 
+Developing
+---
+
+1. Check out the [base-project](https://github.com/danmofo/base-project), make a note of where you checked it out.
+2. Check out this repository.
+3. Use the following to develop: `grunt devChromeExtension --src='/Users/danielmoffat/dev/gayl-plugin/src' --no-tests`, replacing the source with where you checked it out.
+4. Open Chrome, visit [chrome://extensions](chrome://extensions), click **Load unpacked extensions**, pointing it to `./src/extension`.
+5. Open a new tab and try it out!
+
 Installing
 ---
 
-You need [this](https://github.com/danmofo/base-project) project's `Gruntfile`.
-
-1. Checkout source.
-2. `grunt devChromeExtension --src='/whereever/you/checked/it/out'`.
-3. Open `chrome://extensions` -> `'Load unpacked extensions'` -> `/src/extension`.
-4. Open a new tab and try it.
+Todo: add to Google Chrome web store, or find a way to distribute which doesn't involve adding unpacked extensions.
 
 Limitations:
 ---

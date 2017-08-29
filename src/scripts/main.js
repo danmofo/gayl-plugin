@@ -36,6 +36,7 @@ chrome.omnibox.onInputChanged.addListener(
     switch(q.apiType) {
       case API_TYPES.MERCHANT:
         MerchantService.get(q.value).then(function(response) {
+
           chrome.omnibox.setDefaultSuggestion(Suggestion.create('Merchant API: ' + response.numFound + ' result(s) for ' + q.value));
           log(response.numFound + ' results found for ' + q.value);
 
