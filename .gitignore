@@ -1,6 +1,7 @@
 .grunt-temp/
 .grunt-tmp
 prod/
+dest/
 
 # Created by https://www.gitignore.io/api/osx,java,eclipse,node,vagrant,svn,bower,maven,sublimetext
 ### OSX ###
