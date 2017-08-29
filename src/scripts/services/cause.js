@@ -84,32 +84,6 @@ function defaultErrorHandler(error) {
  * @return {Object}          The transformed API response.
  */
 function transform(response) {
-
-	// Replace oldKeys with newKeys (to match the other API response)
-	var oldKeys = ['@numfound', '@count', '@start'];
-	var newKeys = ['numFound', 'count', 'start'];
-
-	oldKeys.forEach(function(key, i) {
-		response[newKeys[i]] = parseInt(response[key], 10);
-		delete response[key];
-	});
-
-	// For some reason in the response if there is only one result
-	// an object is returned (instead of 1 item in an array), if there are no
-	// results the doc field is not even present.
-	//
-	// By sorting it out here we avoid having to do so in the code that uses this service.
-	if(response.numFound === 0) {
-		response.docs = [];
-	} else if(response.numFound === 1) {
-		response.docs = [response.doc];
-	} else {
-		response.docs = response.doc;
-	}
-
-    // Remove the old doc
-	delete response.doc;
-
 	return response;
 }
 

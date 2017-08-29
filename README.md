@@ -1,7 +1,7 @@
 Give as you Live search plugin
 ===
 
-Adds Give as you Live search APIs to Google Chrome's [omnibox](https://developer.chrome.com/extensions/omnibox). Selecting an option adds the relevant part to the omnibox (e.g. "Merchant name: Amazon" would actually contain only `Amazon`) making it easy to look things up.
+Adds Give as you Live search APIs to Google Chrome's [omnibox](https://developer.chrome.com/extensions/omnibox). Selecting an option adds the relevant part to the omnibox (e.g. "Merchant name: Amazon" would actually contain only `Amazon`) making it easy to look things up and copy things to the clipboard.
 
 Basic usage:
 ---
@@ -43,8 +43,12 @@ Limitations:
 Todo:
 ---
 
-- Tweak cause queries, they're bad right now
 - Add task to package extension for production
 - Add to website
 - Add other APIs
 - Replace huge libraries with smaller ones! The output size right now is hilariously bad.
+
+Known bugs
+---
+
+Doesn't support spaces in queries :)
