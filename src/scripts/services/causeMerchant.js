@@ -15,7 +15,6 @@ module.exports = {
   get: get
 };
 
-var Promise = require('es6-promise').Promise;
 var CauseService = require('./cause');
 var MerchantService = require('./merchant');
 

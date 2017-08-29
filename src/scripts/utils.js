@@ -25,6 +25,16 @@ function capitalise(str) {
 }
 
 /**
+ * @param  {[type]}  n The object to test
+ * @return {Boolean}   Whether the object is numeric or not.
+ *
+ * Lifted directly from https://stackoverflow.com/questions/9716468/is-there-any-function-like-isnumeric-in-javascript-to-validate-numbers
+ */
+function isNumeric(n) {
+  return !isNaN(parseFloat(n)) && isFinite(n);
+}
+
+/**
  * Get the templates to use from the specified queryObject.
  * @param  {Object} queryObject The query object (obtained from Query.parse('My query'))
  * @return {String}             The template list key (which maps to a field in the config containing an array of templates)

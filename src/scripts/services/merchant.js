@@ -14,33 +14,32 @@
  *  // Uses getByName
  *  get('amazon');
  *
- * 	@author danielmoffat
+ *  @author danielmoffat
  */
 
 module.exports = {
-	getById: getById,
-	getByName: getByName,
-	get: get,
-	getFirst: getFirst
+    getById: getById,
+    getByName: getByName,
+    get: get,
+    getFirst: getFirst
 };
 
-var Promise = require('es6-promise').Promise;
 var axios = require('axios');
 var querystring = require('querystring');
 var merge = require('merge');
-var isNumber = require('is-number');
+var isNumber = require('../utils').isNumeric;
 var MERCHANT_ENDPOINT = require('../config').ENDPOINTS.merchant;
 
 // Default parameters used in queries
 var defaults = {
-	start: 0,
-	rows: 5,
+    start: 0,
+    rows: 5,
   cid: 1,
-	wt: 'everyclick',
-	fq: 'subscriber:1',
-	facet: true,
-	'facet.mincount': 1,
-	'facet.field': 'category'
+    wt: 'everyclick',
+    fq: 'subscriber:1',
+    facet: true,
+    'facet.mincount': 1,
+    'facet.field': 'category'
 };
 
 /**
@@ -50,20 +49,20 @@ var defaults = {
  * @return {Object}       The merchant object(s) if found or null.
  */
 function get(query) {
-	// Get the query function to use
-	var fn = getQueryFunction(query);
+    // Get the query function to use
+    var fn = getQueryFunction(query);
 
-	return fn(query).catch(defaultErrorHandler);
+    return fn(query).catch(defaultErrorHandler);
 }
 
 // Helper function that calls get and plucks the first result from it.
 function getFirst(query) {
-	return get(query).then(function(resp) {
-		return {
-			numFound: 1,
-			docs: [resp.docs.length ? resp.docs[0] : resp.docs]
-		};
-	});
+    return get(query).then(function(resp) {
+        return {
+            numFound: 1,
+            docs: [resp.docs.length ? resp.docs[0] : resp.docs]
+        };
+    });
 }
 
 /**
@@ -72,8 +71,8 @@ function getFirst(query) {
  * @return {void}
  */
 function defaultErrorHandler(error) {
-	console.log('Something just went wrong.');
-	console.log(error);
+    console.log('Something just went wrong.');
+    console.log(error);
 }
 
 /**
@@ -85,39 +84,39 @@ function defaultErrorHandler(error) {
  */
 function transform(response) {
 
-	// All API results are nested inside result
+    // All API results are nested inside result
     response = response.result;
 
-	// Replace oldKeys with newKeys (to match the other API response)
-	var oldKeys = ['@numFound', '@start'];
-	var newKeys = ['numFound', 'start'];
+    // Replace oldKeys with newKeys (to match the other API response)
+    var oldKeys = ['@numFound', '@start'];
+    var newKeys = ['numFound', 'start'];
 
-	oldKeys.forEach(function(key, i) {
-		response[newKeys[i]] = parseInt(response[key], 10);
-		delete response[key];
-	});
+    oldKeys.forEach(function(key, i) {
+        response[newKeys[i]] = parseInt(response[key], 10);
+        delete response[key];
+    });
 
-	// For some reason in the response if there is only one result
-	// an object is returned (instead of 1 item in an array), if there are no
-	// results the doc field is not even present.
-	//
-	// By sorting it out here we avoid having to do so in the code that uses this service.
-	if(response.numFound === 0) {
-		response.docs = [];
-	} else if(response.numFound === 1) {
-		response.docs = [response.doc];
-	} else {
-		response.docs = response.doc;
-	}
+    // For some reason in the response if there is only one result
+    // an object is returned (instead of 1 item in an array), if there are no
+    // results the doc field is not even present.
+    //
+    // By sorting it out here we avoid having to do so in the code that uses this service.
+    if(response.numFound === 0) {
+        response.docs = [];
+    } else if(response.numFound === 1) {
+        response.docs = [response.doc];
+    } else {
+        response.docs = response.doc;
+    }
 
   // Remove the old doc
-	delete response.doc;
+    delete response.doc;
 
-	// Remove unwanted stuff
-	delete response.lst;
-	delete response['@name'];
+    // Remove unwanted stuff
+    delete response.lst;
+    delete response['@name'];
 
-	return response;
+    return response;
 }
 
 /**
@@ -126,13 +125,13 @@ function transform(response) {
  * @return {Object}    The merchant object if found, or null.
  */
 function getById(id) {
-	if(!id) return;
+    if(!id) return;
 
-	var query = buildQuery({
-		q: 'id:' + id
-	});
+    var query = buildQuery({
+        q: 'id:' + id
+    });
 
-	return makeApiRequest(query);
+    return makeApiRequest(query);
 }
 
 /**
@@ -141,13 +140,13 @@ function getById(id) {
  * @return {Object}      The merchant object(s) or null.
  */
 function getByName(name) {
-	if(!name) return;
+    if(!name) return;
 
-	var query = buildQuery({
-		q: name
-	});
+    var query = buildQuery({
+        q: name
+    });
 
-	return makeApiRequest(query);
+    return makeApiRequest(query);
 }
 
 /**
@@ -157,10 +156,10 @@ function getByName(name) {
  * @return {Promise}      The response.
  */
 function makeApiRequest(query) {
-	return axios.get(query).then(function(resp) {
+    return axios.get(query).then(function(resp) {
     console.log(resp);
     return transform(resp.data);
-	});
+    });
 }
 
 /**
@@ -169,11 +168,11 @@ function makeApiRequest(query) {
  * @return {Function} The query function.
  */
 function getQueryFunction(query) {
-	if(isNumber(query)) {
-		return getById;
-	}
+    if(isNumber(query)) {
+        return getById;
+    }
 
-	return getByName;
+    return getByName;
 }
 
 /**
@@ -182,5 +181,5 @@ function getQueryFunction(query) {
  * @return {String}             The API url.
  */
 function buildQuery(queryParams) {
-	return MERCHANT_ENDPOINT + '?' + querystring.encode(merge(queryParams, defaults));
+    return MERCHANT_ENDPOINT + '?' + querystring.encode(merge(queryParams, defaults));
 }

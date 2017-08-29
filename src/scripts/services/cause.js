@@ -24,11 +24,10 @@ module.exports = {
 	getFirst: getFirst
 };
 
-var Promise = require('es6-promise').Promise;
 var axios = require('axios');
 var querystring = require('querystring');
 var merge = require('merge');
-var isNumber = require('is-number');
+var isNumber = require('../utils').isNumeric;
 var CAUSE_ENDPOINT = require('../config').ENDPOINTS.cause;
 
 // Default parameters used in queries

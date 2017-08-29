@@ -17,11 +17,13 @@
 
 module.exports = Query;
 
-var isNumber = require('is-number');
 var config = require('./config');
+var isNumber = require('./utils').isNumeric;
 
 var DATA_TYPES = config.DATA_TYPES;
 var API_TYPES = config.API_TYPES;
+
+window.Query = Query;
 
 /**
  * Representation of an omnibox query entered by the user.
@@ -50,11 +52,12 @@ Query.prototype.determineDataType = function() {
 Query.parse = function parse(query) {
   if(!query || query === '') return;
 
-  // Split the query up to find out if a command was used
+  // Split the query up to find out if a command was used, it looks something
+  // like this for the query "gl m The White Company": ['m', 'The', 'White', 'Company']
   var bits = query.split(' ');
   var apiType = API_TYPES.UNIVERSAL;
 
-  // Determine the API from the query
+  // Determine the API request from the query
   if(bits.length > 1) {
     switch(bits[0]) {
       case 'm':
@@ -68,15 +71,14 @@ Query.parse = function parse(query) {
     }
   }
 
-  Query.prototype.toString = function toString() {
-    var out = '[Query ';
-    out += 'value=' + this.value + ',';
-    out += 'apiType=' + this.apiType + ',';
-    out += 'dataType=' + this.dataType;
-    out += ']';
-    return out;
-  };
+  return new Query(bits.splice(1).join(' '), apiType);
+};
 
-  // The bits array always contains the query as the last value (and the command as the first, if its there)
-  return new Query(bits.pop(), apiType);
+Query.prototype.toString = function toString() {
+  var out = '[Query ';
+  out += 'value="' + this.value + '", ';
+  out += 'apiType="' + this.apiType + '", ';
+  out += 'dataType="' + this.dataType;
+  out += '"]';
+  return out;
 };

@@ -49,7 +49,10 @@ Todo:
 - Add task to package extension for production
 - Add to website
 - Add other APIs
-- Replace huge libraries with smaller ones! The output size right now is hilariously bad.
+- Add some tests
+- Replace the following libraries with smaller alternatives:
+  - EJS, I'm only using a small amount of the functionality available.
+  - Axios, again I'm only using this for GET requests. Possibly use `fetch`?
 
 Known bugs
 ---
