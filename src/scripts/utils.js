@@ -7,8 +7,8 @@
 module.exports = {
   capitalise: capitalise,
   // todo: parse queryObject and generate the templateList string dynamically
-  getTemplateListFromQueryObject: getTemplateListFromQueryObject
-
+  getTemplateListFromQueryObject: getTemplateListFromQueryObject,
+  isNumeric: isNumeric
 };
 
 var config = require('./config');

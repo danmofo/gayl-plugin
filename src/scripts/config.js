@@ -91,10 +91,10 @@ module.exports = {
 	  },
     'causeRegno': {
       template: '<match>Cause API</match> <dim>(regno)</dim>: <% if(cause && cause.name) { %><%= cause.regno %><% } else { %>None found!<% } %>',
-      content: '<% if(cause && cause.regno) { %><%= cause.regno %><% } else { %>None found! causeName<% } %>'
+      content: '<% if(cause && cause.regno) { %><%= cause.regno %><% } else { %>None found! causeRegno<% } %>'
     },
 	  'causeId': {
-	    template: '<match>Cause API</match> <dim>(id)</dim>: <% if(cause && cause.id) { %><%= cause.id %><% } else { %>None found!<% } %>',
+	    template: '<match>Cause API</match> <dim>(id)</dim>: <% if(cause && cause.id) { %><%= cause.id %><% } else { %>None found!<% } %> - <dim>(<% if (cause && cause.name) { %><%= cause.name %><% }%>)</dim>',
 	    content: '<% if(cause && cause.id) { %><%= cause.id %><% } else { %>None found! causeId<% } %>'
 	  },
 	  'causeImage': {

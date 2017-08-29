@@ -12,14 +12,19 @@ var API_TYPES = config.API_TYPES;
 var DATA_TYPES = config.DATA_TYPES;
 
 /**
- * This event handler fires each time the omnibox input changes (after the command has been entered).
+ *  This event handler fires each time the omnibox input changes (after the command has been entered).
  */
-chrome.omnibox.onInputChanged.addListener(
-  function(text, addSuggestions) {
+chrome.omnibox.onInputChanged.addListener(onOmniboxInputChanged);
 
+/**
+ * This event handler fires when you press ENTER on a suggestion.
+ */
+chrome.omnibox.onInputEntered.addListener(onOmniboxInputSelected);
+
+function onOmniboxInputChanged(text, addSuggestions) {
     // Don't do anything if there isn't a query
     if(!text) {
-      log('No query found, exiting..');
+      log('No query entered, not doing anything.');
       return;
     }
 
@@ -28,7 +33,7 @@ chrome.omnibox.onInputChanged.addListener(
     log('The query: ', q);
 
     if(q.value === '') {
-      log('No query found, exiting...');
+      log('No query value, not doing anything.');
       return;
     }
 
@@ -77,17 +82,13 @@ chrome.omnibox.onInputChanged.addListener(
       default:
         break;
     }
-});
+}
 
-/**
- * This event handler fires when you press ENTER on a suggestion.
- */
-chrome.omnibox.onInputEntered.addListener(function(text) {
-
+function onOmniboxInputSelected(text) {
   // If it's 'link-like' open it in a new tab!
   if(text.indexOf('http') > -1) {
     chrome.tabs.create({
       url: text
     });
   }
-});
+}
