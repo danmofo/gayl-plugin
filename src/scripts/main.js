@@ -68,11 +68,17 @@ function onOmniboxInputChanged(text, addSuggestions) {
 
       case API_TYPES.UNIVERSAL:
         CauseMerchantService.get(q.value).then(function(response) {
-          chrome.omnibox.setDefaultSuggestion(Suggestion.create('Cause / Merchant API.'));
+          var merchantApiResponse = response[0];
+          var causeApiResponse = response[1];
+          var defaultSuggestion = Suggestion.create('Cause (' + causeApiResponse.numFound + ') / Merchant (' + merchantApiResponse.numFound  + ') APIs: ' + (merchantApiResponse.numFound + causeApiResponse.numFound) + ' result(s) for ' + q.value);
+
+          console.log(response);
+
+          chrome.omnibox.setDefaultSuggestion(defaultSuggestion);
 
           var suggestions = Suggestion.buildSuggestions({
-            cause: response.cause.docs[0],
-            merchant: response.merchant.docs[0],
+            cause: causeApiResponse.docs[0],
+            merchant: merchantApiResponse.docs[0],
           }, q);
 
           addSuggestions(suggestions);

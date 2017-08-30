@@ -19,8 +19,5 @@ var CauseService = require('./cause');
 var MerchantService = require('./merchant');
 
 function get(query) {
-  return Promise.props({
-    merchant: MerchantService.getFirst(query),
-    cause: CauseService.getFirst(query)
-  });
+  return Promise.all([MerchantService.getFirst(query), CauseService.getFirst(query)]);
 }

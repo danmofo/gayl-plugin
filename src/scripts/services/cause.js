@@ -59,8 +59,8 @@ function get(query) {
 function getFirst(query) {
 	return get(query).then(function(resp) {
 		return {
-			numFound: 1,
-      docs: [resp.docs.length ? resp.docs[0] : resp.docs]
+			numFound: resp.numFound,
+            docs: [resp.docs.length ? resp.docs[0] : resp.docs]
 		};
 	});
 }

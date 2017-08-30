@@ -71,7 +71,7 @@ Query.parse = function parse(query) {
     }
   }
 
-  return new Query(bits.splice(1).join(' '), apiType);
+  return new Query(bits.length === 1 ? bits[0] : bits.splice(1).join(' '), apiType);
 };
 
 Query.prototype.toString = function toString() {

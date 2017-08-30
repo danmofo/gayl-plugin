@@ -47,15 +47,9 @@ TODO: add to Google Chrome web store, or find a way to distribute which doesn't 
 
 ## TODO
 
-- Add task to package extension for production
 - Add to website
 - Add other APIs
 - Add some tests
 - Replace the following libraries with smaller alternatives:
   - EJS, I'm only using a small amount of the functionality available.
   - Axios, again I'm only using this for GET requests. Possibly use `fetch`?
-
-Known bugs
----
-
-Doesn't support spaces in queries :)
